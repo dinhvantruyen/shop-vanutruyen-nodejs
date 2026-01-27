@@ -1,0 +1,63 @@
+<% const active = "staff"; %>
+<% const actions = [{ href: "/admin/staff/new", label: "Thêm nhân viên", className: "btn btn-dark btn-sm" }]; %>
+<%- include("partials/head", { title, active }) %>
+<%- include("partials/topbar", { heading: "Quản lý nhân viên", subtitle: "Quản lý hồ sơ nhân viên", actions }) %>
+
+        <div class="card border-0 shadow-sm">
+          <div class="table-responsive">
+            <table class="table mb-0 align-middle admin-table">
+              <thead class="table-light">
+                <tr>
+                  <th class="text-center">Họ tên</th>
+                  <th class="text-center">Email</th>
+                  <th class="text-center">Số điện thoại</th>
+                  <th class="text-center">Chức vụ</th>
+                  <th class="text-center">Ca làm</th>
+                  <th class="text-center">Trạng thái</th>
+                  <th class="text-center">Hành động</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% if (staff.length === 0) { %>
+                  <tr>
+                    <td colspan="7" class="text-center text-muted py-4">
+                      Chưa có nhân viên nào.
+                    </td>
+                  </tr>
+                <% } else { %>
+                  <% staff.forEach((member) => { %>
+                    <tr>
+                      <td class="text-center"><%= member.name %></td>
+                      <td class="text-center"><%= member.email %></td>
+                      <td class="text-center"><%= member.phone || "-" %></td>
+                      <td class="text-center"><%= member.position || "-" %></td>
+                      <td class="text-center"><%= member.shift || "-" %></td>
+                      <td class="text-center">
+                        <span class="badge text-bg-<%= member.status === 'inactive' ? 'secondary' : 'success' %>">
+                          <%= member.status === 'inactive' ? 'Nghỉ' : 'Đang làm' %>
+                        </span>
+                      </td>
+                      <td class="text-center">
+                        <a class="btn btn-outline-dark btn-sm" href="/admin/staff/<%= member._id %>/edit">
+                          Sửa
+                        </a>
+                        <form
+                          method="post"
+                          action="/admin/staff/<%= member._id %>/delete"
+                          class="d-inline"
+                          onsubmit="return confirm('Xóa nhân viên này?')"
+                        >
+                          <button class="btn btn-outline-danger btn-sm" type="submit">
+                            Xóa
+                          </button>
+                        </form>
+                      </td>
+                    </tr>
+                  <% }) %>
+                <% } %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+<%- include("partials/footer") %>

@@ -1,0 +1,255 @@
+<!-- Nhúng phần Head và Header chung -->
+<%- include("../partials/head", { title }) %>
+<%- include("../partials/header") %>
+
+<!-- Phần nội dung chính: Chi tiết sản phẩm -->
+<main class="container py-5">
+  <div class="row g-4 product-detail">
+    <div class="col-12 col-lg-6">
+      <!-- Khối hình ảnh sản phẩm (Gallery) -->
+      <div class="product-gallery">
+        <% const gallery = [product.mainImage].concat(product.galleryImages || []).filter(Boolean); %>
+        <!-- Hình ảnh chính đang hiển thị -->
+        <div class="product-main-image" id="mainImage">
+          <% if (gallery.length) { %>
+            <img src="<%= gallery[0] %>" alt="<%= product.name %>" />
+          <% } else { %>
+            <div class="media-placeholder">No image</div>
+          <% } %>
+        </div>
+        <% if (gallery.length > 1) { %>
+          <!-- Danh sách ảnh nhỏ (Thumbnails) để chuyển đổi ảnh chính -->
+          <div class="product-thumbs" id="thumbs">
+            <% gallery.forEach((img, index) => { %>
+              <button
+                class="thumb-btn <%= index === 0 ? 'active' : '' %>"
+                type="button"
+                data-src="<%= img %>"
+              >
+                <img src="<%= img %>" alt="<%= product.name %>" />
+              </button>
+            <% }) %>
+          </div>
+        <% } %>
+      </div>
+    </div>
+    <div class="col-12 col-lg-6">
+      <div class="product-info">
+        <h1><%= product.name %></h1>
+        <!-- Hiển thị giá và giảm giá (nếu có) -->
+        <div class="product-pricing">
+          <% if (product.discountPercent > 0) { %>
+            <% const discounted = Math.round(product.price * (100 - product.discountPercent) / 100); %>
+            <span class="price-now"><%= discounted.toLocaleString("vi-VN") %> VND</span>
+            <span class="price-old"><%= product.price.toLocaleString("vi-VN") %> VND</span>
+            <span class="price-discount">-<%= product.discountPercent %>%</span>
+          <% } else { %>
+            <span class="price-now"><%= product.price.toLocaleString("vi-VN") %> VND</span>
+          <% } %>
+        </div>
+
+        <!-- Trạng thái kho hàng -->
+        <div class="product-status">
+          <span class="badge text-bg-<%= product.stock > 0 ? 'success' : 'secondary' %>">
+            <%= product.stock > 0 ? 'Còn hàng' : 'Hết hàng' %>
+          </span>
+          <span class="stock-count">
+            <strong><%= product.stock %></strong> sản phẩm còn lại
+          </span>
+          <% if (product.category) { %>
+            <span class="text-muted ms-2"><%= product.category.name %></span>
+          <% } %>
+        </div>
+
+        <!-- Form thêm vào giỏ hàng: Gửi POST đến /cart/add -->
+        <form class="product-actions-form" method="post" action="/cart/add">
+          <input type="hidden" name="productId" value="<%= product._id %>" />
+          <!-- Bộ chọn số lượng -->
+          <div class="quantity-picker">
+            <button type="button" class="qty-btn" data-action="decrease">-</button>
+            <input
+              class="qty-input"
+              type="number"
+              name="quantity"
+              min="1"
+              value="1"
+            />
+            <button type="button" class="qty-btn" data-action="increase">+</button>
+          </div>
+          <!-- Các tùy chọn sản phẩm (Size, Màu sắc) -->
+          <div class="product-options">
+            <!-- Chọn Size -->
+            <div class="option-group">
+              <div class="option-title">Size</div>
+              <div class="option-values">
+                <% const sizeOptions = product.sizes && product.sizes.length ? product.sizes : ["S", "M", "L", "XL"]; %>
+                <% sizeOptions.forEach((size, index) => { %>
+                  <label class="option-pill">
+                    <input type="radio" name="size" value="<%= size %>" <%= index === 0 ? "required" : "" %> />
+                    <span><%= size %></span>
+                  </label>
+                <% }) %>
+              </div>
+            </div>
+            <!-- Chọn Màu sắc -->
+           <div class="option-group">
+              <div class="option-title">Màu sắc</div>
+              <div class="option-values">
+                <% const colorOptions = product.colors && product.colors.length ? product.colors : ["Đen", "Trắng"]; %>
+                <% const colorLabels = { Den: "Đen", Trang: "Trắng", Do: "Đỏ", Xanh: "Xanh", Be: "Be", Nau: "Nâu" }; %>
+                <% colorOptions.forEach((color, index) => { %>
+                  <% const displayColor = colorLabels[color] || color; %>
+                  <label class="option-pill">
+                    <input type="radio" name="color" value="<%= color %>" <%= index === 0 ? "required" : "" %> />
+                    <span><%= displayColor %></span>
+                  </label>
+                <% }) %>
+              </div>
+            </div>
+          </div>
+
+          <!-- Nút hành động (Thêm vào giỏ, Mua ngay) -->
+          <div class="product-actions">
+            <button class="btn btn-dark btn-lg" type="submit">Thêm vào giỏ</button>
+            <button class="btn btn-outline-dark btn-lg" type="submit" name="redirect" value="checkout">
+              Mua ngay
+            </button>
+          </div>
+        </form>
+
+        <!-- Mô tả chi tiết và thông số kỹ thuật -->
+        <div class="product-description">
+          <h2>Mô tả sản phẩm</h2>
+          <div class="spec-table">
+            <div class="spec-row">
+              <div class="spec-label">Công nghệ</div>
+              <div class="spec-value"><%= product.specs && product.specs.technology ? product.specs.technology : "-" %></div>
+            </div>
+            <div class="spec-row">
+              <div class="spec-label">Mã sản phẩm</div>
+              <div class="spec-value"><%= product.specs && product.specs.sku ? product.specs.sku : "-" %></div>
+            </div>
+            <div class="spec-row">
+              <div class="spec-label">Chất liệu</div>
+              <div class="spec-value"><%= product.specs && product.specs.material ? product.specs.material : "-" %></div>
+            </div>
+            <div class="spec-row">
+              <div class="spec-label">Kiểu dáng</div>
+              <div class="spec-value"><%= product.specs && product.specs.fit ? product.specs.fit : "-" %></div>
+            </div>
+            <div class="spec-row">
+              <div class="spec-label">Phù hợp</div>
+              <div class="spec-value"><%= product.specs && product.specs.suitableFor ? product.specs.suitableFor : "-" %></div>
+            </div>
+            <div class="spec-row">
+              <div class="spec-label">Tính năng</div>
+              <div class="spec-value"><%= product.specs && product.specs.features ? product.specs.features : "-" %></div>
+            </div>
+            <div class="spec-row">
+              <div class="spec-label">Bảo quản</div>
+             <div class="spec-value"><%= product.specs && product.specs.care ? product.specs.care : "-" %></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Phần sản phẩm liên quan -->
+  <section class="related-products mt-5">
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <h2 class="h4 mb-0">Sản phẩm liên quan</h2>
+      <% const parentName = product.category && product.category.parent ? product.category.parent.name : ""; %>
+      <% const categoryPath =
+        parentName === "Nam"
+          ? "/nam"
+          : parentName === "Nu"
+          ? "/nu"
+          : parentName === "Tre em"
+          ? "/tre-em"
+          : "/new"; %>
+      <a href="<%= categoryPath %>" class="btn btn-outline-dark btn-sm">Xem tất cả</a>
+    </div>
+    <div class="product-grid">
+      <% if (related.length === 0) { %>
+        <div class="alert alert-warning">Chưa có sản phẩm liên quan.</div>
+      <% } else { %>
+        <% related.forEach((item) => { %>
+          <% const image = item.mainImage || (item.galleryImages && item.galleryImages[0]) || ""; %>
+          <article class="product-card">
+            <div class="product-media">
+              <% if (image) { %>
+                <img src="<%= image %>" alt="<%= item.name %>" />
+              <% } else { %>
+                <div class="media-placeholder">No image</div>
+              <% } %>
+            </div>
+            <div class="product-body">
+              <h2><a href="/products/<%= item._id %>"><%= item.name %></a></h2>
+              <div class="product-price">
+                <span class="price-now"><%= item.price.toLocaleString("vi-VN") %> VND</span>
+              </div>
+            </div>
+          </article>
+        <% }) %>
+      <% } %>
+    </div>
+  </section>
+</main>
+
+<!-- Dữ liệu JSON ẩn để script sử dụng (lưu lịch sử xem) -->
+<script id="recentlyData" type="application/json">
+  <%- JSON.stringify({
+    id: product._id,
+    name: product.name || "",
+    price: product.price || 0,
+    image: product.mainImage || (product.galleryImages && product.galleryImages[0]) || ""
+  }) %>
+</script>
+
+<!-- Script xử lý logic client-side: Gallery, số lượng, lưu lịch sử xem -->
+<script>
+  const thumbs = document.getElementById("thumbs");
+  const mainImage = document.getElementById("mainImage");
+  thumbs?.addEventListener("click", (event) => {
+    const btn = event.target.closest(".thumb-btn");
+    if (!btn) return;
+    const src = btn.getAttribute("data-src");
+    const img = mainImage.querySelector("img");
+    if (img && src) {
+      img.src = src;
+      document.querySelectorAll(".thumb-btn").forEach((el) => el.classList.remove("active"));
+      btn.classList.add("active");
+    }
+  });
+
+  const qtyInput = document.querySelector(".qty-input");
+  document.querySelectorAll(".qty-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      if (!qtyInput) return;
+      const current = parseInt(qtyInput.value, 10) || 1;
+      if (btn.dataset.action === "decrease") {
+        qtyInput.value = Math.max(1, current - 1);
+      } else {
+        qtyInput.value = current + 1;
+      }
+    });
+  });
+
+  const dataEl = document.getElementById("recentlyData");
+  const viewedProduct = dataEl ? JSON.parse(dataEl.textContent || "{}") : null;
+  if (viewedProduct && viewedProduct.id) {
+    let storedViewed = [];
+    try {
+      storedViewed = JSON.parse(localStorage.getItem("recentlyViewed") || "[]");
+    } catch (err) {
+      storedViewed = [];
+    }
+    const filteredViewed = storedViewed.filter((item) => item.id !== viewedProduct.id);
+    filteredViewed.unshift(viewedProduct);
+    localStorage.setItem("recentlyViewed", JSON.stringify(filteredViewed.slice(0, 5)));
+  }
+</script>
+
+<!-- Nhúng phần Footer chung -->
+<%- include("../partials/footer") %>

@@ -1,0 +1,274 @@
+<%- include("../partials/head", { title }) %>
+  <%- include("../partials/header") %>
+
+    <main class="container-fluid new-page nam-page">
+      <!-- Banner giới thiệu danh mục nam -->
+      <section class="banner">
+        <img src="/images/banners/banner_nam.png" alt="Sản phẩm nam" />
+        <div class="banner-content">
+          <span class="banner-eyebrow">Menswear</span>
+          <h1>Bộ sưu tập nam</h1>
+          <p>Tối giản, nam tính, chất liệu cao cấp cho phong cách hằng ngày.</p>
+          </div>
+      </section>
+
+      <!-- Thanh lọc bộ sưu tập nam -->
+      <section class="filter-bar">
+        <div class="filter-title">Bộ sưu tập nam</div>
+        <div class="filter-pills">
+          <a class="filter-pill <%= !selected ? 'active' : '' %>" href="/nam#products" data-category="">
+            Tất cả
+          </a>
+          <% categories.forEach((category)=> { %>
+            <a class="filter-pill <%= selected === category._id.toString() ? 'active' : '' %>"
+              href="/nam?category=<%= category._id %>#products" data-category="<%= category._id %>">
+              <%= category.name %>
+            </a>
+            <% }) %>
+        </div>
+      </section>
+
+      <!-- Bố cục danh sách sản phẩm không có sidebar -->
+      <div class="new-layout no-sidebar">
+        <section class="new-content" id="products">
+          <% const discounted=products.filter((p)=> p.discountPercent > 0); %>
+            <% const regular=products.filter((p)=> !p.discountPercent || p.discountPercent === 0); %>
+
+              <div id="allSections">
+                <div class="product-section">
+                  <h2 class="section-title">Ưu đãi nổi bật</h2>
+                  <div id="discountedEmpty" class="alert alert-warning hidden">Chưa có sản phẩm giảm giá.</div>
+                  <div class="product-grid">
+                    <% discounted.forEach((product)=> { %>
+                      <% const image=product.mainImage || (product.galleryImages && product.galleryImages[0]) || "" ; %>
+                        <article class="product-card"
+                          data-category="<%= product.category ? product.category.toString() : '' %>">
+                          <div class="product-media">
+                            <% if (image) { %>
+                              <a href="/products/<%= product._id %>">
+                                <img src="<%= image %>" alt="<%= product.name %>" />
+                              </a>
+                              <% } else { %>
+                                <div class="media-placeholder">No image</div>
+                                <% } %>
+                                  <span class="product-badge">-<%= product.discountPercent %>%</span>
+                          </div>
+                          <div class="product-body">
+                            <div class="product-meta">Bộ sưu tập nam</div>
+                            <h2><a href="/products/<%= product._id %>">
+                                <%= product.name %>
+                              </a></h2>
+                            <div class="product-price">
+                              <% const discountedPrice=Math.round(product.price * (100 - product.discountPercent) /
+                                100); %>
+                                <span class="price-now">
+                                  <%= discountedPrice.toLocaleString("vi-VN") %> VND
+                                </span>
+                                <span class="price-old">
+                                  <%= product.price.toLocaleString("vi-VN") %> VND
+                                </span>
+                            </div>
+                          </div>
+                        </article>
+                        <% }) %>
+                  </div>
+                </div>
+
+                <div class="product-section mt-4">
+                  <h2 class="section-title">Sản phẩm nổi bật</h2>
+                  <div id="regularEmpty" class="alert alert-warning hidden">Chưa có sản phẩm không giảm giá.</div>
+                  <div class="product-grid">
+                    <% regular.forEach((product)=> { %>
+                      <% const image=product.mainImage || (product.galleryImages && product.galleryImages[0]) || "" ; %>
+                        <article class="product-card"
+                          data-category="<%= product.category ? product.category.toString() : '' %>">
+                          <div class="product-media">
+                            <% if (image) { %>
+                              <a href="/products/<%= product._id %>">
+                                <img src="<%= image %>" alt="<%= product.name %>" />
+                              </a>
+                              <% } else { %>
+                                <div class="media-placeholder">No image</div>
+                                <% } %>
+                          </div>
+                          <div class="product-body">
+                            <div class="product-meta">Bộ sưu tập nam</div>
+                            <h2><a href="/products/<%= product._id %>">
+                                <%= product.name %>
+                              </a></h2>
+                            <div class="product-price">
+                              <span class="price-now">
+                                <%= product.price.toLocaleString("vi-VN") %> VND
+                              </span>
+                            </div>
+                          </div>
+                        </article>
+                        <% }) %>
+                  </div>
+                </div>
+              </div>
+        </section>
+      </div>
+
+      <!-- Banner tư vấn phong cách -->
+      <section class="intro-banner">
+        <div class="intro-content">
+          <h2>Tư vấn phong cách đồ nam</h2>
+          <p>
+            Cần gợi ý phối đồ, chọn size hay chất liệu phù hợp? Đội ngũ tư vấn sẽ
+            giúp bạn chọn được phong cách tự tin và thoải mái.
+          </p>
+          <div class="intro-actions">
+            <a class="btn btn-dark" href="/ho-tro">Liên hệ tư vấn</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Gợi ý sản phẩm và danh mục khác -->
+      <section class="suggested-section">
+        <div class="suggested-products">
+          <h3>Gợi ý đồ nữ</h3>
+          <div class="product-grid">
+            <% if (!femaleProducts || femaleProducts.length===0) { %>
+              <div class="alert alert-warning">Chưa có sản phẩm đồ nữ.</div>
+              <% } else { %>
+                <% femaleProducts.forEach((product)=> { %>
+                  <% const image=product.mainImage || (product.galleryImages && product.galleryImages[0]) || "" ; %>
+                    <article class="product-card">
+                      <div class="product-media">
+                        <% if (image) { %>
+                          <a href="/products/<%= product._id %>">
+                            <img src="<%= image %>" alt="<%= product.name %>" />
+                          </a>
+                          <% } else { %>
+                            <div class="media-placeholder">No image</div>
+                            <% } %>
+                      </div>
+                      <div class="product-body">
+                        <h2><a href="/products/<%= product._id %>">
+                            <%= product.name %>
+                          </a></h2>
+                        <div class="product-price">
+                          <span class="price-now">
+                            <%= product.price.toLocaleString("vi-VN") %> VND
+                          </span>
+                        </div>
+                      </div>
+                    </article>
+                    <% }) %>
+                      <% } %>
+          </div>
+
+          <h3 class="mt-4">Gợi ý đồ trẻ em</h3>
+          <div class="product-grid">
+            <% if (!kidProducts || kidProducts.length===0) { %>
+              <div class="alert alert-warning">Chưa có sản phẩm đồ trẻ em.</div>
+              <% } else { %>
+                <% kidProducts.forEach((product)=> { %>
+                  <% const image=product.mainImage || (product.galleryImages && product.galleryImages[0]) || "" ; %>
+                    <article class="product-card">
+                      <div class="product-media">
+                        <% if (image) { %>
+                          <a href="/products/<%= product._id %>">
+                            <img src="<%= image %>" alt="<%= product.name %>" />
+                          </a>
+                          <% } else { %>
+                            <div class="media-placeholder">No image</div>
+                            <% } %>
+                      </div>
+                      <div class="product-body">
+                        <h2><a href="/products/<%= product._id %>">
+                            <%= product.name %>
+                          </a></h2>
+                        <div class="product-price">
+                          <span class="price-now">
+                            <%= product.price.toLocaleString("vi-VN") %> VND
+                          </span>
+                        </div>
+                      </div>
+                    </article>
+                    <% }) %>
+                      <% } %>
+          </div>
+        </div>
+
+        <div class="suggested-header">
+          <h2>Gợi ý danh mục khác</h2>
+          <p>Mở rộng lựa chọn với các bộ sưu tập phối đồ theo mùa.</p>
+        </div>
+        <div class="suggested-grid">
+          <a class="suggested-card" href="/nu">
+            <div class="suggested-content">
+              <span class="suggested-tag">Đồ nữ</span>
+              <h3>Thanh lịch, tối giản</h3>
+              <span class="suggested-cta">Khám phá ngay</span>
+            </div>
+          </a>
+          <a class="suggested-card" href="/tre-em">
+            <div class="suggested-content">
+              <span class="suggested-tag">Đồ trẻ em</span>
+              <h3>Thoải mái, bền bỉ</h3>
+              <span class="suggested-cta">Khám phá ngay</span>
+            </div>
+          </a>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      // Nhóm nút lọc danh mục
+      const pills = document.querySelectorAll(".filter-pill");
+      const allSections = document.getElementById("allSections");
+      const discountedEmpty = document.getElementById("discountedEmpty");
+      const regularEmpty = document.getElementById("regularEmpty");
+
+      // Cập nhật trạng thái nút đang chọn
+      const setActive = (category) => {
+        pills.forEach((pill) => {
+          const isActive = pill.dataset.category === category;
+          if (!category && pill.dataset.category === "") {
+            pill.classList.add("active");
+          } else {
+            pill.classList.toggle("active", isActive);
+          }
+        });
+      };
+
+      // Lọc sản phẩm theo danh mục đã chọn
+      const applyFilter = (category) => {
+        const cards = allSections.querySelectorAll(".product-card");
+        cards.forEach((card) => {
+          const match = !category || card.dataset.category === category;
+          card.style.display = match ? "" : "none";
+        });
+
+        const discountedVisible = Array.from(
+          allSections.querySelectorAll(".product-section:first-child .product-card")
+        ).some((card) => card.style.display !== "none");
+        const regularVisible = Array.from(
+          allSections.querySelectorAll(".product-section:last-child .product-card")
+        ).some((card) => card.style.display !== "none");
+
+        discountedEmpty.classList.toggle("hidden", discountedVisible);
+        regularEmpty.classList.toggle("hidden", regularVisible);
+      };
+
+      // Gắn sự kiện click vào nút lọc
+      pills.forEach((pill) => {
+        pill.addEventListener("click", (event) => {
+          event.preventDefault();
+          const category = pill.dataset.category || "";
+          setActive(category);
+          applyFilter(category);
+          const url = category ? `/nam?category=${category}#products` : "/nam#products";
+          window.history.replaceState({}, "", url);
+        });
+      });
+
+      // Khởi tạo trang theo danh mục đang chọn
+      applyFilter("<%= selected %>");
+      setActive("<%= selected %>");
+    </script>
+
+    <%- include("../partials/footer") %>
+

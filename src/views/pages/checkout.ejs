@@ -1,0 +1,126 @@
+<!-- Nhúng phần Head và Header chung -->
+<%- include("../partials/head", { title }) %>
+<%- include("../partials/header") %>
+
+<!-- Phần nội dung chính: Trang thanh toán -->
+<main class="checkout-modern">
+  <div class="container">
+    <div class="checkout-hero">
+      <div>
+        <h1 class="checkout-title">Thanh toán</h1>
+        <p class="checkout-subtitle">Xác nhận thông tin và hoàn tất đơn hàng.</p>
+      </div>
+      <a class="btn btn-outline-dark btn-sm" href="/cart">Quay lại giỏ hàng</a>
+    </div>
+
+    <!-- Kiểm tra danh sách sản phẩm thanh toán -->
+    <% if (items.length === 0) { %>
+      <div class="alert alert-warning">Giỏ hàng đang trống.</div>
+    <% } else { %>
+      <div class="checkout-shell">
+        <section class="checkout-stack">
+          <!-- Khối thông tin giao hàng (lấy từ thông tin người dùng) -->
+          <div class="checkout-box">
+            <div class="checkout-box-head">
+              <h2>Thông tin giao hàng</h2>
+              <a class="btn btn-outline-dark btn-sm" href="/profile/address">Cập nhật</a>
+            </div>
+            <div class="checkout-grid">
+              <div class="checkout-field">
+                <span>Người nhận</span>
+                <strong><%= user && user.receiverName ? user.receiverName : "-" %></strong>
+              </div>
+              <div class="checkout-field">
+                <span>Số điện thoại</span>
+                <strong><%= user && user.phone ? user.phone : "-" %></strong>
+              </div>
+              <div class="checkout-field">
+                <span>Tỉnh/Thành phố</span>
+                <strong><%= user && user.city ? user.city : "-" %></strong>
+              </div>
+              <div class="checkout-field">
+                <span>Phường/Xã</span>
+                <strong><%= user && user.ward ? user.ward : "-" %></strong>
+              </div>
+              <div class="checkout-field checkout-field-full">
+                <span>Địa chỉ cụ thể</span>
+                <strong><%= user && user.address ? user.address : "-" %></strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- Khối danh sách sản phẩm trong đơn hàng -->
+          <div class="checkout-box">
+            <div class="checkout-box-head">
+              <h2>Sản phẩm</h2>
+              <span class="checkout-count"><%= items.length %> sản phẩm</span>
+            </div>
+            <div class="checkout-items-modern">
+              <!-- Lặp qua từng sản phẩm để hiển thị -->
+              <% items.forEach((item) => { %>
+                <div class="checkout-item-card">
+                  <div class="checkout-thumb">
+                    <% if (item.mainImage) { %>
+                      <img src="<%= item.mainImage %>" alt="<%= item.name %>" />
+                    <% } else { %>
+                      <div class="media-placeholder">No image</div>
+                    <% } %>
+                  </div>
+                  <div class="checkout-item-info">
+                    <div class="checkout-item-title"><%= item.name %></div>
+                    <div class="checkout-item-meta">
+                      <% if (item.size) { %>Size: <%= item.size %><% } %>
+                      <% if (item.color) { %> | Màu: <%= item.color %><% } %>
+                    </div>
+                  </div>
+                  <div class="checkout-item-qty">x<%= item.quantity %></div>
+                  <div class="checkout-item-price"><%= item.price.toLocaleString("vi-VN") %> VND</div>
+                </div>
+              <% }) %>
+            </div>
+          </div>
+        </section>
+
+        <aside class="checkout-aside">
+          <!-- Khối tổng kết đơn hàng (Tạm tính, Phí ship, Tổng cộng) -->
+          <div class="checkout-box checkout-summary-modern">
+            <h2>Tổng cộng</h2>
+            <div class="checkout-summary-row">
+              <span>Tạm tính</span>
+              <strong><%= subtotal.toLocaleString("vi-VN") %> VND</strong>
+            </div>
+            <div class="checkout-summary-row">
+              <span>Phí vận chuyển</span>
+              <strong><%= shipping.toLocaleString("vi-VN") %> VND</strong>
+            </div>
+            <div class="checkout-summary-total">
+              <span>Thanh toán</span>
+              <strong><%= total.toLocaleString("vi-VN") %> VND</strong>
+            </div>
+
+            <!-- Lựa chọn phương thức thanh toán -->
+            <div class="checkout-payment">
+              <div class="checkout-payment-title">Hình thức thanh toán</div>
+              <label class="checkout-payment-option">
+                <input type="radio" name="paymentMethod" value="cod" checked />
+                Thanh toán khi nhận hàng
+              </label>
+              <label class="checkout-payment-option">
+                <input type="radio" name="paymentMethod" value="momo" />
+                Ví điện tử
+              </label>
+            </div>
+
+            <!-- Form submit để đặt hàng -->
+            <form method="post" action="/checkout">
+              <button class="btn btn-dark checkout-submit" type="submit">Đặt hàng</button>
+            </form>
+          </div>
+        </aside>
+      </div>
+    <% } %>
+  </div>
+</main>
+
+<!-- Nhúng phần Footer chung -->
+<%- include("../partials/footer") %>

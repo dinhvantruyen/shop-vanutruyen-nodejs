@@ -1,0 +1,99 @@
+<% const active = "staff"; %>
+<% const actions = [{ href: "/admin/staff", label: "Quay lại", className: "btn btn-outline-dark btn-sm" }]; %>
+<%- include("partials/head", { title, active }) %>
+<%- include("partials/topbar", { heading: title, subtitle: "Cập nhật hồ sơ nhân viên", actions }) %>
+
+        <!-- Form thêm/sửa nhân viên -->
+        <div class="card border-0 shadow-sm">
+          <div class="card-body p-4">
+            <!-- Action tự động chọn tạo mới hoặc cập nhật -->
+            <form method="post" action="<%= staffMember ? '/admin/staff/' + staffMember._id : '/admin/staff' %>">
+              <div class="mb-3">
+                <label class="form-label">Họ tên</label>
+                <input
+                  class="form-control"
+                  name="name"
+                  type="text"
+                  required
+                  value="<%= staffMember ? staffMember.name : '' %>"
+                />
+              </div>
+              <!-- Thông tin liên hệ -->
+              <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input
+                  class="form-control"
+                  name="email"
+                  type="email"
+                  required
+                  value="<%= staffMember ? staffMember.email : '' %>"
+                />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Số điện thoại</label>
+                <input
+                  class="form-control"
+                  name="phone"
+                  type="text"
+                  value="<%= staffMember ? staffMember.phone : '' %>"
+                />
+              </div>
+              <!-- Thông tin công việc -->
+              <div class="mb-3">
+                <label class="form-label">Chức vụ</label>
+                <input
+                  class="form-control"
+                  name="position"
+                  type="text"
+                  value="<%= staffMember ? staffMember.position : '' %>"
+                />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Ca làm</label>
+                <input
+                  class="form-control"
+                  name="shift"
+                  type="text"
+                  placeholder="VD: Ca sáng, Ca chiều"
+                  value="<%= staffMember ? staffMember.shift : '' %>"
+                />
+              </div>
+              <!-- Thu nhập và ngày bắt đầu -->
+              <div class="mb-3">
+                <label class="form-label">Lương (VND)</label>
+                <input
+                  class="form-control"
+                  name="salary"
+                  type="number"
+                  min="0"
+                  step="1000"
+                  value="<%= staffMember ? staffMember.salary : 0 %>"
+                />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Ngày vào làm</label>
+                <input
+                  class="form-control"
+                  name="startDate"
+                  type="date"
+                  value="<%= staffMember && staffMember.startDate ? staffMember.startDate.toISOString().slice(0,10) : '' %>"
+                />
+              </div>
+              <!-- Trạng thái hoạt động -->
+              <div class="mb-3">
+                <label class="form-label">Trạng thái</label>
+                <select class="form-select" name="status">
+                  <option value="active" <%= !staffMember || staffMember.status === 'active' ? 'selected' : '' %>>
+                    Đang làm
+                  </option>
+                  <option value="inactive" <%= staffMember && staffMember.status === 'inactive' ? 'selected' : '' %>>
+                    Nghỉ
+                  </option>
+                </select>
+              </div>
+              <button class="btn btn-dark" type="submit">Lưu</button>
+            </form>
+          </div>
+        </div>
+
+<%- include("partials/footer") %>

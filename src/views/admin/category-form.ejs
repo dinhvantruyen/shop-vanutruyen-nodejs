@@ -1,0 +1,64 @@
+<% const active = "categories"; %>
+<% const actions = [{ href: "/admin/categories", label: "Quay lại", className: "btn btn-outline-dark btn-sm" }]; %>
+<%- include("partials/head", { title, active }) %>
+<%- include("partials/topbar", { heading: title, subtitle: "Cập nhật thông tin danh mục", actions }) %>
+
+        <!-- Form tạo/sửa danh mục -->
+        <div class="card border-0 shadow-sm">
+          <div class="card-body p-4">
+            <% if (error) { %>
+              <div class="alert alert-danger"><%= error %></div>
+            <% } %>
+            <!-- Action tự động chọn tạo mới hoặc cập nhật -->
+            <form method="post" action="<%= category ? '/admin/categories/' + category._id : '/admin/categories' %>">
+              <div class="mb-3">
+                <label class="form-label">Tên danh mục</label>
+                <input
+                  class="form-control"
+                  name="name"
+                  type="text"
+                  required
+                  value="<%= category ? category.name : '' %>"
+                />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Danh mục cha</label>
+                <select
+                  class="form-select"
+                  name="parent"
+                  <%= category && !category.parent ? "disabled" : "" %>
+                >
+                  <option value="">Không có</option>
+                  <% categories.forEach((item) => { %>
+                    <option
+                      value="<%= item._id %>"
+                      <%= category && category.parent && category.parent.toString() === item._id.toString() ? "selected" : "" %>
+                    >
+                      <%= item.name %>
+                    </option>
+                  <% }) %>
+                </select>
+                <div class="form-text">
+                  Chỉ để trống nếu tạo danh mục cha (Nam, Nữ, Trẻ em).
+                </div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Mô tả</label>
+                <textarea class="form-control" name="description" rows="3"><%= category ? category.description : '' %></textarea>
+              </div>
+              <div class="form-check mb-3">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  name="isActive"
+                  value="true"
+                  id="categoryActive"
+                  <%= !category || category.isActive ? "checked" : "" %>
+                />
+                <label class="form-check-label" for="categoryActive">Hoạt động</label>
+              </div>
+              <button class="btn btn-dark" type="submit">Lưu</button>
+            </form>
+          </div>
+        </div>
+<%- include("partials/footer") %>

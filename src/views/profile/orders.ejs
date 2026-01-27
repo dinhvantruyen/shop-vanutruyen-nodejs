@@ -1,0 +1,81 @@
+<%- include("../partials/head", { title }) %>
+  <%- include("../partials/header") %>
+
+    <!-- Trang theo dõi đơn hàng -->
+    <main class="container py-5">
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-4">
+          <h1 class="h4 mb-2">Theo dõi đơn hàng</h1>
+          <p class="text-muted mb-3">Xem tình trạng các đơn hàng đã đặt.</p>
+          <div class="d-flex flex-wrap gap-2">
+            <a class="btn btn-outline-dark" href="/profile">Thông tin cá nhân</a>
+            <a class="btn btn-dark" href="/profile/orders">Theo dõi đơn hàng</a>
+            <a class="btn btn-outline-dark" href="/profile/password">Thay đổi mật khẩu</a>
+            <a class="btn btn-outline-dark" href="/profile/address">Cập nhật địa chỉ</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Danh sách đơn hàng của tài khoản -->
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+          <h2 class="h6 text-uppercase text-muted">Danh sách đơn hàng</h2>
+          <!-- Thông báo đặt hàng thành công -->
+          <% if (successId) { %>
+            <div class="alert alert-success mb-3">
+              Đặt hàng thành công. Mã đơn:
+              <strong>
+                <%= successId.toString().slice(-6).toUpperCase() %>
+              </strong>
+            </div>
+            <% } %>
+              <!-- Nếu không có đơn hàng thì hiện gợi ý -->
+              <% if (!orders || orders.length===0) { %>
+                <p class="text-muted mb-3">
+                  Chưa có đơn hàng nào. Khi mua hàng, tình trạng đơn sẽ hiển thị tại đây.
+                </p>
+                <a class="btn btn-outline-dark btn-sm" href="/new">Khám phá sản phẩm</a>
+                <% } else { %>
+                  <!-- Bảng đơn hàng -->
+                  <div class="table-responsive">
+                    <table class="table align-middle mb-0 text-center">
+                      <thead>
+                        <tr>
+                          <th>Mã đơn</th>
+                          <th>Ngày đặt</th>
+                          <th>Số sản phẩm</th>
+                          <th>Tổng tiền</th>
+                          <th>Trạng thái</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <% orders.forEach((order)=> { %>
+                          <tr>
+                            <td>
+                              <a href="/profile/orders/<%= order._id %>">
+                                <%= order._id.toString().slice(-6).toUpperCase() %>
+                              </a>
+                            </td>
+                            <td>
+                              <%= new Date(order.createdAt).toLocaleDateString("vi-VN") %>
+                            </td>
+                            <td>
+                              <%= order.items ? order.items.length : 0 %>
+                            </td>
+                            <td>
+                              <%= order.total.toLocaleString("vi-VN") %> VND
+                            </td>
+                            <td><span class="badge text-bg-dark">
+                                <%= order.status %>
+                              </span></td>
+                          </tr>
+                          <% }) %>
+                      </tbody>
+                    </table>
+                  </div>
+                  <% } %>
+        </div>
+      </div>
+    </main>
+
+    <%- include("../partials/footer") %>

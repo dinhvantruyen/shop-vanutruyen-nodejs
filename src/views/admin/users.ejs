@@ -1,0 +1,68 @@
+<% const active = "users"; %>
+<%- include("partials/head", { title, active }) %>
+<%- include("partials/topbar", { heading: "Quản lý tài khoản", subtitle: "Danh sách tài khoản khách hàng", actions: [] }) %>
+
+        <!-- Bảng danh sách tài khoản khách hàng -->
+        <div class="card border-0 shadow-sm">
+          <div class="table-responsive">
+            <table class="table mb-0 align-middle admin-table">
+              <thead class="table-light">
+                <tr>
+                  <th class="text-center">Tên</th>
+                  <th class="text-center">Email</th>
+                  <th class="text-center">Trạng thái</th>
+                  <th class="text-center">Ngày tạo</th>
+                  <th class="text-center">Hành động</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Nếu chưa có tài khoản thì hiện thông báo -->
+                <% if (users.length === 0) { %>
+                  <tr>
+                    <td colspan="4" class="text-center text-muted py-4">
+                      Chưa có tài khoản nào.
+                    </td>
+                  </tr>
+                <% } else { %>
+                  <!-- Lặp qua danh sách tài khoản -->
+                  <% users.forEach((user) => { %>
+                    <tr>
+                      <td class="text-center"><%= user.name %></td>
+                      <td class="text-center"><%= user.email %></td>
+                      <td class="text-center">
+                        <span class="badge text-bg-<%= user.isActive === false ? 'secondary' : 'success' %>">
+                          <%= user.isActive === false ? 'Bị khóa' : 'Hoạt động' %>
+                        </span>
+                      </td>
+                      <td class="text-center">
+                        <%= user.createdAt ? new Date(user.createdAt).toLocaleDateString("vi-VN") : "-" %>
+                      </td>
+                      <td class="text-center">
+                        <form method="post" action="/admin/users/<%= user._id %>/toggle" class="d-inline">
+                          <button
+                            class="btn btn-outline-<%= user.isActive === false ? 'dark' : 'danger' %> btn-sm"
+                            type="submit"
+                          >
+                            <%= user.isActive === false ? 'Mở khóa' : 'Khóa' %>
+                          </button>
+                        </form>
+                        <form
+                          method="post"
+                          action="/admin/users/<%= user._id %>/delete"
+                          class="d-inline"
+                          onsubmit="return confirm('Xóa tài khoản này?')"
+                        >
+                          <button class="btn btn-outline-secondary btn-sm" type="submit">
+                            Xóa
+                          </button>
+                        </form>
+                      </td>
+                    </tr>
+                  <% }) %>
+                <% } %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+<%- include("partials/footer") %>

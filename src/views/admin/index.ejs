@@ -1,0 +1,143 @@
+<% const active="dashboard" ; %>
+  <%- include("partials/head", { title, active }) %>
+    <%- include("partials/topbar", { heading: "Dashboard" , subtitle: "Thống kê tổng quan của hệ thống" , actions: [] })
+      %>
+
+      <!-- Khung dashboard chính: thống kê + truy cập nhanh + thông báo -->
+      <div class="row g-3">
+        <div class="col-12 col-lg-8">
+          <!-- Nhóm thẻ thống kê tổng quan -->
+          <div class="row g-3">
+            <div class="col-12 col-md-6">
+              <div class="admin-card">
+                <div class="admin-card-icon">
+                  <i class="bi bi-tags"></i>
+                </div>
+                <div>
+                  <p class="admin-card-label">Tổng danh mục</p>
+                  <h2>
+                    <%= categoryCount %>
+                  </h2>
+                  <span class="text-muted small">Cập nhật bộ sưu tập</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 col-md-6">
+              <div class="admin-card">
+                <div class="admin-card-icon">
+                  <i class="bi bi-box-seam"></i>
+                </div>
+                <div>
+                  <p class="admin-card-label">Tổng sản phẩm</p>
+                  <h2>
+                    <%= productCount %>
+                  </h2>
+                  <span class="text-muted small">Đang bán & sắp ra mắt</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 col-md-6">
+              <div class="admin-card">
+                <div class="admin-card-icon">
+                  <i class="bi bi-receipt"></i>
+                </div>
+                <div>
+                  <p class="admin-card-label">Đơn hàng mới</p>
+                  <h2>
+                    <%= typeof orderCount !=="undefined" ? orderCount : 0 %>
+                  </h2>
+                  <span class="text-muted small">Cần xử lý</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-12 col-md-6">
+              <div class="admin-card">
+                <div class="admin-card-icon">
+                  <i class="bi bi-people"></i>
+                </div>
+                <div>
+                  <p class="admin-card-label">Khách hàng</p>
+                  <h2>
+                    <%= typeof customerCount !=="undefined" ? customerCount : 0 %>
+                  </h2>
+                  <span class="text-muted small">Đang hoạt động</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Khối truy cập nhanh -->
+          <div class="admin-panel mt-4">
+            <div class="admin-panel-header">
+              <h3>Truy cập nhanh</h3>
+              <span class="text-muted">Tác vụ quản trị hay dùng</span>
+            </div>
+            <div class="row g-3">
+              <div class="col-12 col-lg-4">
+                <div class="admin-panel-card">
+                  <h4>Thêm sản phẩm</h4>
+                  <p>Tạo sản phẩm mới và cập nhật ảnh.</p>
+                  <a class="btn btn-dark btn-sm" href="/admin/products/new">
+                    Tạo sản phẩm
+                  </a>
+                </div>
+              </div>
+              <div class="col-12 col-lg-4">
+                <div class="admin-panel-card">
+                  <h4>Quản lý đơn hàng</h4>
+                  <p>Theo dõi trạng thái và xử lý nhanh.</p>
+                  <a class="btn btn-outline-dark btn-sm" href="/admin/orders">
+                    Xem đơn hàng
+                  </a>
+                </div>
+              </div>
+              <div class="col-12 col-lg-4">
+                <div class="admin-panel-card">
+                  <h4>Quản lý tài khoản</h4>
+                  <p>Cập nhật thông tin khách hàng.</p>
+                  <a class="btn btn-outline-dark btn-sm" href="/admin/users">
+                    Danh sách tài khoản
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 col-lg-4">
+          <!-- Khu vực thông báo nhanh bên phải -->
+          <div class="admin-panel">
+            <div class="admin-panel-header">
+              <h3>Thông báo nhanh</h3>
+              <span class="text-muted">Tình trạng hệ thống hôm nay</span>
+            </div>
+            <div class="admin-panel-card mb-3">
+              <h4>Doanh thu</h4>
+              <p class="fw-semibold mb-1">
+                <%= typeof totalRevenue !=="undefined" ? totalRevenue.toLocaleString("vi-VN") : "0" %> VND
+              </p>
+              <p class="text-muted mb-2">Tổng doanh thu từ đơn hoàn thành.</p>
+              <a class="btn btn-outline-dark btn-sm" href="/admin/revenue">
+                Xem báo cáo
+              </a>
+            </div>
+            <div class="admin-panel-card mb-3">
+              <h4>Đơn hàng cần xử lý</h4>
+              <p>
+                <%= typeof orderCount !=="undefined" ? orderCount : 0 %> đơn hàng mới cần xử lý.
+              </p>
+              <a class="btn btn-outline-dark btn-sm" href="/admin/orders">
+                Kiểm tra đơn hàng
+              </a>
+            </div>
+            <div class="admin-panel-card">
+              <h4>Quản lý nhân viên</h4>
+              <p>Cập nhật thông tin nhân viên.</p>
+              <a class="btn btn-dark btn-sm" href="/admin/staff">
+                Danh sách nhân viên
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <%- include("partials/footer") %>

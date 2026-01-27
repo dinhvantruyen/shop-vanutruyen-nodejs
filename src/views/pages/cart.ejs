@@ -1,0 +1,248 @@
+<!-- Nhúng phần Head và Header chung -->
+<%- include("../partials/head", { title }) %>
+<%- include("../partials/header") %>
+
+<!-- Phần nội dung chính: Trang giỏ hàng -->
+<main class="container py-5 cart-page">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">Giỏ hàng</h1>
+    <a class="btn btn-outline-dark btn-sm" href="/new">Tiếp tục mua sắm</a>
+  </div>
+
+  <!-- Kiểm tra nếu giỏ hàng trống -->
+  <% if (items.length === 0) { %>
+    <div class="alert alert-warning">Giỏ hàng đang trống.</div>
+  <% } else { %>
+    <!-- Hiển thị danh sách sản phẩm trong giỏ -->
+    <div class="cart-panel">
+      <div class="cart-top">
+        <label class="cart-select-all">
+          <input class="form-check-input" type="checkbox" id="selectAllCart" />
+          <span>Chọn tất cả</span>
+        </label>
+        <form id="checkoutSelectedForm" method="post" action="/cart/checkout-selected"></form>
+      </div>
+
+      <div class="cart-list">
+        <!-- Lặp qua từng sản phẩm trong giỏ hàng -->
+        <% items.forEach((item) => { %>
+          <div class="cart-row" data-cart-row>
+            <!-- Checkbox chọn sản phẩm để thanh toán -->
+            <div class="cart-cell cart-check">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                form="checkoutSelectedForm"
+                name="selected"
+                data-cart-select
+                data-product="<%= item.id %>"
+                data-size="<%= item.size %>"
+                data-color="<%= item.color %>"
+                value="<%= item.id %>|<%= item.size %>|<%= item.color %>|<%= item.quantity %>"
+              />
+            </div>
+            <!-- Hình ảnh sản phẩm -->
+            <div class="cart-cell cart-thumb">
+              <% if (item.mainImage) { %>
+                <img src="<%= item.mainImage %>" alt="<%= item.name %>" />
+              <% } else { %>
+                <div class="media-placeholder">No image</div>
+              <% } %>
+            </div>
+            <!-- Thông tin chi tiết sản phẩm (Tên, Size, Màu, Giá) -->
+            <div class="cart-cell cart-detail">
+              <h2><%= item.name %></h2>
+              <div class="text-muted">
+                <% if (item.size) { %>Size: <%= item.size %><% } %>
+                <% const colorLabels = { Den: "Đen", Trang: "Trắng", Do: "Đỏ", Xanh: "Xanh", Be: "Be", Nau: "Nâu" }; %>
+                <% if (item.color) { %> | Màu: <%= colorLabels[item.color] || item.color %><% } %>
+              </div>
+              <div class="cart-price" data-item-price="<%= item.price %>"><%= item.price.toLocaleString("vi-VN") %> VND</div>
+            </div>
+            <!-- Form cập nhật số lượng -->
+            <div class="cart-cell cart-qty-col">
+              <form method="post" action="/cart/update" class="cart-qty-form">
+                <input type="hidden" name="productId" value="<%= item.id %>" />
+                <input type="hidden" name="size" value="<%= item.size %>" />
+                <input type="hidden" name="color" value="<%= item.color %>" />
+                <button class="btn btn-outline-dark btn-sm qty-btn" type="button" data-qty="-1">-</button>
+                <input
+                  class="form-control form-control-sm qty-input"
+                  type="number"
+                  name="quantity"
+                  min="1"
+                  max="<%= typeof item.stock === 'number' ? item.stock : '' %>"
+                  value="<%= item.quantity %>"
+                />
+                <button class="btn btn-outline-dark btn-sm qty-btn" type="button" data-qty="1">+</button>
+              </form>
+            </div>
+            <!-- Form xóa sản phẩm khỏi giỏ -->
+            <div class="cart-cell cart-remove">
+              <form method="post" action="/cart/remove">
+                <input type="hidden" name="productId" value="<%= item.id %>" />
+                <input type="hidden" name="size" value="<%= item.size %>" />
+                <input type="hidden" name="color" value="<%= item.color %>" />
+                <button class="btn btn-outline-danger btn-sm" type="submit">Xóa</button>
+              </form>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    </div>
+
+    <!-- Phần tổng kết đơn hàng (Tạm tính, Tổng cộng) -->
+    <div class="cart-summary">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+          <h2 class="h6 text-uppercase text-muted">Tổng cộng</h2>
+          <div class="summary-list">
+            <div class="summary-row">
+              <span>Tạm tính</span>
+              <strong data-summary-subtotal="<%= subtotal %>"><%= subtotal.toLocaleString("vi-VN") %> VND</strong>
+            </div>
+            <div class="summary-row">
+              <span>Giảm giá</span>
+              <strong>0 VND</strong>
+            </div>
+            <div class="summary-row">
+              <span>Phí vận chuyển</span>
+              <strong>0 VND</strong>
+            </div>
+          </div>
+          <div class="summary-total">
+            <span>Thanh toán</span>
+            <strong data-summary-total="<%= subtotal %>"><%= subtotal.toLocaleString("vi-VN") %> VND</strong>
+          </div>
+          <!-- Nút thanh toán các sản phẩm đã chọn -->
+          <button class="btn btn-dark w-100 mt-3" type="submit" form="checkoutSelectedForm">
+            Thanh toán
+          </button>
+        </div>
+      </div>
+    </div>
+  <% } %>
+</main>
+
+<!-- Script xử lý logic client-side: chọn tất cả, cập nhật số lượng, tính tổng tiền -->
+<script>
+  const selectAll = document.getElementById("selectAllCart");
+  const itemChecks = document.querySelectorAll("[data-cart-select]");
+  const syncCheckbox = (row) => {
+    const checkbox = row.querySelector("[data-cart-select]");
+    const qtyInput = row.querySelector(".qty-input");
+    if (!checkbox || !qtyInput) return;
+    checkbox.value = `${checkbox.dataset.product}|${checkbox.dataset.size}|${checkbox.dataset.color}|${qtyInput.value}`;
+  };
+
+  const updateSelectAllState = () => {
+    if (!selectAll || !itemChecks.length) return;
+    const allChecked = Array.from(itemChecks).every((el) => el.checked);
+    const anyChecked = Array.from(itemChecks).some((el) => el.checked);
+    selectAll.checked = allChecked;
+    selectAll.indeterminate = !allChecked && anyChecked;
+  };
+
+  if (selectAll && itemChecks.length) {
+    selectAll.addEventListener("change", () => {
+      itemChecks.forEach((input) => {
+        input.checked = selectAll.checked;
+      });
+      updateSelectAllState();
+      updateTotals();
+    });
+    itemChecks.forEach((input) => {
+      input.addEventListener("change", () => {
+        updateSelectAllState();
+        updateTotals();
+      });
+    });
+  }
+
+  const submitQty = async (form) => {
+    const formData = new FormData(form);
+    const body = new URLSearchParams(formData);
+    try {
+      await fetch("/cart/update", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body,
+      });
+    } catch (err) {
+      // fallback to normal submit if fetch fails
+      form.submit();
+    }
+  };
+
+  const updateTotals = () => {
+    let subtotal = 0;
+    let selectedQty = 0;
+    let cartQty = 0;
+    document.querySelectorAll("[data-cart-row]").forEach((row) => {
+      const checkbox = row.querySelector("[data-cart-select]");
+      const priceEl = row.querySelector("[data-item-price]");
+      const qtyInput = row.querySelector(".qty-input");
+      const price = priceEl ? parseFloat(priceEl.dataset.itemPrice || "0") : 0;
+      const qty = qtyInput ? parseInt(qtyInput.value, 10) || 1 : 1;
+      cartQty += qty;
+      if (checkbox && checkbox.checked) {
+        subtotal += price * qty;
+        selectedQty += qty;
+      }
+    });
+    const subtotalEl = document.querySelector("[data-summary-subtotal]");
+    const totalEl = document.querySelector("[data-summary-total]");
+    if (subtotalEl) {
+      subtotalEl.dataset.summarySubtotal = String(subtotal);
+      subtotalEl.textContent = `${subtotal.toLocaleString("vi-VN")} VND`;
+    }
+    if (totalEl) {
+      totalEl.dataset.summaryTotal = String(subtotal);
+      totalEl.textContent = `${subtotal.toLocaleString("vi-VN")} VND`;
+    }
+    const cartBtn = document.querySelector(".cart-btn");
+    if (cartBtn) {
+      let badge = cartBtn.querySelector(".cart-badge");
+      if (cartQty > 0) {
+        if (!badge) {
+          badge = document.createElement("span");
+          badge.className = "cart-badge";
+          cartBtn.appendChild(badge);
+        }
+        badge.textContent = cartQty;
+      } else if (badge) {
+        badge.remove();
+      }
+    }
+  };
+
+  const qtyForms = document.querySelectorAll(".cart-qty-form");
+  qtyForms.forEach((form) => {
+    const row = form.closest("[data-cart-row]");
+    const input = form.querySelector(".qty-input");
+    const buttons = form.querySelectorAll(".qty-btn");
+    if (input) {
+      input.addEventListener("input", () => syncCheckbox(row));
+      input.addEventListener("change", () => submitQty(form));
+    }
+    buttons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const delta = parseInt(button.dataset.qty, 10) || 0;
+        const current = parseInt(input.value, 10) || 1;
+        const max = parseInt(input.max, 10) || Infinity;
+        const next = Math.min(Math.max(1, current + delta), max);
+        input.value = next;
+        syncCheckbox(row);
+        updateTotals();
+        submitQty(form);
+      });
+    });
+  });
+
+  document.querySelectorAll("[data-cart-row]").forEach((row) => syncCheckbox(row));
+  updateSelectAllState();
+  updateTotals();
+</script>
+
+<!-- Nhúng phần Footer chung -->
+<%- include("../partials/footer") %>

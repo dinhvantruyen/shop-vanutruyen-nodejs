@@ -1,0 +1,58 @@
+<% const active = "orders"; %>
+<%- include("partials/head", { title, active }) %>
+<%- include("partials/topbar", { heading: "Quản lý đơn hàng", subtitle: "Danh sách đơn hàng khách hàng đã đặt", actions: [] }) %>
+
+        <!-- Bảng danh sách đơn hàng -->
+        <div class="card border-0 shadow-sm">
+          <div class="table-responsive">
+            <table class="table mb-0 align-middle admin-table">
+              <thead class="table-light">
+                <tr>
+                  <th class="text-center">Mã đơn</th>
+                  <th>Khách hàng</th>
+                  <th class="text-center">Số sản phẩm</th>
+                  <th class="text-center">Tổng tiền</th>
+                  <th class="text-center">Trạng thái</th>
+                  <th class="text-center">Ngày tạo</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Nếu chưa có đơn hàng thì hiện thông báo -->
+                <% if (orders.length === 0) { %>
+                  <tr>
+                    <td colspan="6" class="text-center text-muted py-4">
+                      Chưa có đơn hàng nào.
+                    </td>
+                  </tr>
+                <% } else { %>
+                  <!-- Lặp qua các đơn hàng -->
+                  <% orders.forEach((order) => { %>
+                    <tr>
+                      <td class="text-center">
+                        <a class="text-decoration-none fw-semibold" href="/admin/orders/<%= order._id %>">
+                          <%= order._id.toString().slice(-6).toUpperCase() %>
+                        </a>
+                      </td>
+                      <td>
+                        <div class="fw-semibold"><%= order.user ? order.user.name : "Khách hàng" %></div>
+                        <div class="text-muted small"><%= order.user ? order.user.email : "-" %></div>
+                      </td>
+                      <td class="text-center"><%= order.items ? order.items.length : 0 %></td>
+                      <td class="text-center">
+                        <%= (order.total || 0).toLocaleString("vi-VN") %> VND
+                      </td>
+                      <td class="text-center">
+                        <span class="badge text-bg-secondary"><%= order.status %></span>
+                      </td>
+                      <td class="text-center">
+                        <%= order.createdAt ? new Date(order.createdAt).toLocaleDateString("vi-VN") : "-" %>
+                      </td>
+                    </tr>
+                  <% }) %>
+                <% } %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+<%- include("partials/footer") %>

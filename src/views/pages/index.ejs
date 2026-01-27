@@ -1,0 +1,257 @@
+<%- include("../partials/head", { title }) %>
+  <%- include("../partials/header") %>
+
+    <main class="container py-5">
+      <!-- Banner slider trang chủ -->
+      <section class="banner mb-5">
+        <div id="homeBanner" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
+          <div class="carousel-indicators">
+            <button type="button" data-bs-target="#homeBanner" data-bs-slide-to="0" class="active" aria-current="true"
+              aria-label="Banner 1"></button>
+            <button type="button" data-bs-target="#homeBanner" data-bs-slide-to="1" aria-label="Banner 2"></button>
+          </div>
+          <div class="carousel-inner">
+            <div class="carousel-item active">
+              <img src="/images/banners/banner_home_1.png" alt="Banner trang chủ 1" />
+              <div class="banner-content">
+                <span class="banner-eyebrow">New Season</span>
+                <h1>Phong cách tối giản, hiện đại</h1>
+                <p>Chọn đồ chất lượng, dễ phối, hợp mọi hoàn cảnh.</p>
+                <a class="btn btn-dark" href="/new">Khám phá bộ sưu tập</a>
+              </div>
+            </div>
+            <div class="carousel-item">
+              <img src="/images/banners/banner_home_2.png" alt="Banner trang chủ 2" />
+              <div class="banner-content">
+                <span class="banner-eyebrow">Best Choice</span>
+                <h1>Đồ nam tinh tế, chi tiết nổi bật</h1>
+                <p>Thiết kế thanh lịch, phù hợp công sở và đi chơi.</p>
+                <a class="btn btn-dark" href="/nam">Xem đồ nam</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Hero thông điệp nhanh + thẻ thông tin -->
+      <div class="row align-items-center g-4">
+        <div class="col-lg-6">
+          <h1 class="display-5 fw-bold">Bộ sưu tập mới 2025</h1>
+          <p class="lead text-muted">
+            Thiết kế tối giản, chất liệu cao cấp, phong cách hiện đại cho mỗi ngày.
+          </p>
+          <div class="d-flex gap-2">
+            <a class="btn btn-dark" href="/ban-chay">Khám phá ngay</a>
+            <a class="btn btn-outline-dark" href="/new">Sản phẩm mới</a>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="hero-card p-4 p-lg-5 rounded-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <span class="badge text-bg-dark">New</span>
+              <i class="bi bi-stars fs-4"></i>
+            </div>
+            <h2 class="h4 fw-semibold">Set đồ nổi bật</h2>
+            <p class="text-muted mb-0">
+              Mix &amp; match linh hoạt, từ công sở đến đi chơi.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bộ sưu tập theo đối tượng -->
+      <section class="category-strip mt-5">
+        <h2 class="section-title">Bộ sưu tập theo đối tượng</h2>
+        <div class="category-grid">
+          <a class="category-card" href="/nam">
+            <div class="category-media">
+              <img src="/images/banners/category_nam.png" alt="Đồ nam" />
+            </div>
+            <span class="category-label">Nam</span>
+          </a>
+          <a class="category-card" href="/nu">
+            <div class="category-media">
+              <img src="/images/banners/category_nu.png" alt="Đồ nữ" />
+            </div>
+            <span class="category-label">Nữ</span>
+          </a>
+          <a class="category-card" href="/tre-em">
+            <div class="category-media">
+              <img src="/images/banners/category_tre_em.png" alt="Đồ trẻ em" />
+            </div>
+            <span class="category-label">Trẻ em</span>
+          </a>
+        </div>
+      </section>
+
+      <!-- Banner quần nam -->
+      <section class="banner mt-5">
+        <img src="/images/banners/banner_quan_nam.png" alt="Banner quần nam" />
+        <div class="banner-content">
+          <span class="banner-eyebrow">Quần nam</span>
+          <h1>Đồ thu đông nam tính</h1>
+          <p>Chất liệu ấm áp, phối đồ đơn giản, hợp mỗi ngày.</p>
+          <a class="btn btn-dark" href="/nam">Xem bộ sưu tập</a>
+        </div>
+      </section>
+
+      <!-- Danh sách đề xuất quần âu -->
+      <section class="mt-5">
+        <h2 class="section-title">Đề xuất quần âu</h2>
+        <% if (!quanAuProducts || quanAuProducts.length===0) { %>
+          <div class="alert alert-warning">Chưa có sản phẩm quần âu.</div>
+          <% } else { %>
+            <div class="product-grid">
+              <% quanAuProducts.forEach((product)=> { %>
+                <% const image=product.mainImage || (product.galleryImages && product.galleryImages[0]) || "" ; %>
+                  <article class="product-card">
+                    <div class="product-media">
+                      <% if (image) { %>
+                        <a href="/products/<%= product._id %>">
+                          <img src="<%= image %>" alt="<%= product.name %>" />
+                        </a>
+                        <% } else { %>
+                          <div class="media-placeholder">No image</div>
+                          <% } %>
+                    </div>
+                    <div class="product-body">
+                      <div class="product-meta">Quần âu</div>
+                      <h2><a href="/products/<%= product._id %>">
+                          <%= product.name %>
+                        </a></h2>
+                      <div class="product-price">
+                        <span class="price-now">
+                          <%= product.price.toLocaleString("vi-VN") %> VND
+                        </span>
+                      </div>
+                    </div>
+                  </article>
+                  <% }) %>
+            </div>
+            <% } %>
+      </section>
+
+      <!-- Banner áo nữ -->
+      <section class="banner mt-5">
+        <img src="/images/banners/banner_ao_nu.png" alt="Banner áo nữ" />
+        <div class="banner-content">
+          <span class="banner-eyebrow">Áo nữ</span>
+          <h1>Thanh lịch, nhẹ nhàng mỗi ngày</h1>
+          <p>Thiết kế tinh tế, dễ kết hợp, tôn dáng tự nhiên.</p>
+          <a class="btn btn-dark" href="/nu">Xem bộ sưu tập</a>
+        </div>
+      </section>
+
+      <!-- Danh sách đề xuất áo polo nữ -->
+      <section class="mt-5">
+        <h2 class="section-title">Đề xuất áo polo nữ</h2>
+        <% if (!aoPoloNuProducts || aoPoloNuProducts.length===0) { %>
+          <div class="alert alert-warning">Chưa có sản phẩm áo polo nữ.</div>
+          <% } else { %>
+            <div class="product-grid">
+              <% aoPoloNuProducts.forEach((product)=> { %>
+                <% const image=product.mainImage || (product.galleryImages && product.galleryImages[0]) || "" ; %>
+                  <article class="product-card">
+                    <div class="product-media">
+                      <% if (image) { %>
+                        <a href="/products/<%= product._id %>">
+                          <img src="<%= image %>" alt="<%= product.name %>" />
+                        </a>
+                        <% } else { %>
+                          <div class="media-placeholder">No image</div>
+                          <% } %>
+                    </div>
+                    <div class="product-body">
+                      <div class="product-meta">Áo polo nữ</div>
+                      <h2><a href="/products/<%= product._id %>">
+                          <%= product.name %>
+                        </a></h2>
+                      <div class="product-price">
+                        <span class="price-now">
+                          <%= product.price.toLocaleString("vi-VN") %> VND
+                        </span>
+                      </div>
+                    </div>
+                  </article>
+                  <% }) %>
+            </div>
+            <% } %>
+      </section>
+
+      <!-- Banner đồ bộ trẻ em -->
+      <section class="banner mt-5">
+        <img src="/images/banners/banner_do_bo_tre_em.png" alt="Banner đồ bộ trẻ em" />
+        <div class="banner-content">
+          <span class="banner-eyebrow">Đồ bộ trẻ em</span>
+          <h1>Mềm mại, thoải mái cho bé</h1>
+          <p>Chất liệu an toàn, dễ mặc, dễ vận động mỗi ngày.</p>
+          <a class="btn btn-dark" href="/tre-em">Xem bộ sưu tập</a>
+        </div>
+      </section>
+
+      <!-- Danh sách đề xuất đồ bộ trẻ em -->
+      <section class="mt-5">
+        <h2 class="section-title">Đề xuất đồ bộ trẻ em</h2>
+        <% if (!doBoTreEmProducts || doBoTreEmProducts.length===0) { %>
+          <div class="alert alert-warning">Chưa có sản phẩm đồ bộ.</div>
+          <% } else { %>
+            <div class="product-grid">
+              <% doBoTreEmProducts.forEach((product)=> { %>
+                <% const image=product.mainImage || (product.galleryImages && product.galleryImages[0]) || "" ; %>
+                  <article class="product-card">
+                    <div class="product-media">
+                      <% if (image) { %>
+                        <a href="/products/<%= product._id %>">
+                          <img src="<%= image %>" alt="<%= product.name %>" />
+                        </a>
+                        <% } else { %>
+                          <div class="media-placeholder">No image</div>
+                          <% } %>
+                    </div>
+                    <div class="product-body">
+                      <div class="product-meta">Đồ bộ</div>
+                      <h2><a href="/products/<%= product._id %>">
+                          <%= product.name %>
+                        </a></h2>
+                      <div class="product-price">
+                        <span class="price-now">
+                          <%= product.price.toLocaleString("vi-VN") %> VND
+                        </span>
+                      </div>
+                    </div>
+                  </article>
+                  <% }) %>
+            </div>
+            <% } %>
+      </section>
+
+      <!-- Cam kết dịch vụ -->
+      <section class="assurance-strip mt-5">
+        <h2 class="section-title">Cam kết dịch vụ</h2>
+        <div class="assurance-grid">
+          <div class="assurance-card">
+            <i class="bi bi-arrow-repeat"></i>
+            <h3>Đổi trả 30 ngày</h3>
+            <p>Đổi trả linh hoạt nếu sản phẩm không phù hợp.</p>
+          </div>
+          <div class="assurance-card">
+            <i class="bi bi-gem"></i>
+            <h3>Chất liệu cao cấp</h3>
+            <p>Chọn chất liệu bền đẹp, an toàn cho da.</p>
+          </div>
+          <div class="assurance-card">
+            <i class="bi bi-truck"></i>
+            <h3>Giao hàng nhanh</h3>
+            <p>Nhận hàng trong 2–3 ngày tại nội thành.</p>
+          </div>
+          <div class="assurance-card">
+            <i class="bi bi-headset"></i>
+            <h3>Hỗ trợ 24/7</h3>
+            <p>Tư vấn size, phối đồ và bảo hành tận tâm.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <%- include("../partials/footer") %>
+

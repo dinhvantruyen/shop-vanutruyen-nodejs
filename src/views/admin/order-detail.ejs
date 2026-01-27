@@ -1,0 +1,137 @@
+<% const active = "orders"; %>
+<%- include("partials/head", { title, active }) %>
+<%- include("partials/topbar", { heading: "Chi tiết đơn hàng", subtitle: "Theo dõi thông tin và cập nhật trạng thái", actions: [{ href: "/admin/orders", label: "Quay lại", className: "btn btn-outline-dark btn-sm" }] }) %>
+
+        <!-- Khung chi tiết đơn hàng: thông tin + danh sách sản phẩm -->
+        <div class="row g-3">
+          <div class="col-12 col-lg-7">
+            <!-- Thông tin giao hàng và trạng thái -->
+            <div class="card border-0 shadow-sm mb-3">
+              <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-start">
+                  <div>
+                    <div class="text-uppercase text-muted small">Mã đơn</div>
+                    <div class="h5 mb-0"><%= order._id.toString().toUpperCase() %></div>
+                  </div>
+                  <div class="text-end">
+                    <div class="text-uppercase text-muted small">Trạng thái</div>
+                    <span class="badge text-bg-secondary"><%= order.status %></span>
+                  </div>
+                </div>
+                <hr />
+                <h6 class="text-uppercase text-muted">Thông tin giao hàng</h6>
+                <div class="row g-2">
+                  <div class="col-md-6">
+                    <div class="small text-muted">Người nhận</div>
+                    <div class="fw-semibold"><%= order.shippingInfo?.receiverName || "-" %></div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="small text-muted">Số điện thoại</div>
+                    <div class="fw-semibold"><%= order.shippingInfo?.phone || "-" %></div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="small text-muted">Tỉnh/Thành phố</div>
+                    <div class="fw-semibold"><%= order.shippingInfo?.city || "-" %></div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="small text-muted">Phường/Xã</div>
+                    <div class="fw-semibold"><%= order.shippingInfo?.ward || "-" %></div>
+                  </div>
+                  <div class="col-12">
+                    <div class="small text-muted">Địa chỉ cụ thể</div>
+                    <div class="fw-semibold"><%= order.shippingInfo?.address || "-" %></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bảng danh sách sản phẩm trong đơn -->
+            <div class="card border-0 shadow-sm">
+              <div class="card-body p-4">
+                <h6 class="text-uppercase text-muted mb-3">Sản phẩm</h6>
+                <div class="table-responsive">
+                  <table class="table mb-0 align-middle admin-table">
+                    <thead class="table-light">
+                      <tr>
+                        <th>Tên sản phẩm</th>
+                        <th class="text-center">Số lượng</th>
+                        <th class="text-center">Đơn giá</th>
+                        <th class="text-center">Thành tiền</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <% order.items.forEach((item) => { %>
+                        <tr>
+                          <td>
+                            <div class="fw-semibold"><%= item.name %></div>
+                            <div class="text-muted small">
+                              <% if (item.size) { %>Size: <%= item.size %><% } %>
+                              <% if (item.color) { %> | Màu: <%= item.color %><% } %>
+                            </div>
+                          </td>
+                          <td class="text-center"><%= item.quantity %></td>
+                          <td class="text-center"><%= item.price.toLocaleString("vi-VN") %> VND</td>
+                          <td class="text-center">
+                            <%= (item.price * item.quantity).toLocaleString("vi-VN") %> VND
+                          </td>
+                        </tr>
+                      <% }) %>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 col-lg-5">
+            <!-- Thông tin khách hàng -->
+            <div class="card border-0 shadow-sm mb-3">
+              <div class="card-body p-4">
+                <h6 class="text-uppercase text-muted mb-3">Khách hàng</h6>
+                <div class="fw-semibold"><%= order.user ? order.user.name : "Khách hàng" %></div>
+                <div class="text-muted"><%= order.user ? order.user.email : "-" %></div>
+                <div class="text-muted small mt-2">
+                  Ngày tạo: <%= order.createdAt ? new Date(order.createdAt).toLocaleString("vi-VN") : "-" %>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tổng tiền đơn hàng -->
+            <div class="card border-0 shadow-sm mb-3">
+              <div class="card-body p-4">
+                <h6 class="text-uppercase text-muted mb-3">Tổng cộng</h6>
+                <div class="d-flex justify-content-between mb-2">
+                  <span>Tạm tính</span>
+                  <strong><%= order.subtotal.toLocaleString("vi-VN") %> VND</strong>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                  <span>Phí vận chuyển</span>
+                  <strong><%= order.shipping.toLocaleString("vi-VN") %> VND</strong>
+                </div>
+                <div class="d-flex justify-content-between fs-5 fw-semibold border-top pt-3">
+                  <span>Thanh toán</span>
+                  <span><%= order.total.toLocaleString("vi-VN") %> VND</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Form cập nhật trạng thái đơn -->
+            <div class="card border-0 shadow-sm">
+              <div class="card-body p-4">
+                <h6 class="text-uppercase text-muted mb-3">Cập nhật trạng thái</h6>
+                <form method="post" action="/admin/orders/<%= order._id %>/status">
+                  <select class="form-select mb-3" name="status">
+                    <% ["Chờ xác nhận", "Đang giao", "Hoàn thành", "Đã hủy"].forEach((value) => { %>
+                      <option value="<%= value %>" <%= order.status === value ? "selected" : "" %>>
+                        <%= value %>
+                      </option>
+                    <% }) %>
+                  </select>
+                  <button class="btn btn-dark w-100" type="submit">Cập nhật</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+<%- include("partials/footer") %>

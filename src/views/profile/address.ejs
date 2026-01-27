@@ -1,0 +1,72 @@
+<%- include("../partials/head", { title }) %>
+  <%- include("../partials/header") %>
+
+    <!-- Trang cập nhật địa chỉ giao hàng -->
+    <main class="container py-5">
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-4">
+          <h1 class="h4 mb-2">Cập nhật địa chỉ</h1>
+          <p class="text-muted mb-3">Lưu địa chỉ giao hàng để đặt hàng nhanh hơn.</p>
+          <div class="d-flex flex-wrap gap-2">
+            <a class="btn btn-outline-dark" href="/profile">Thông tin cá nhân</a>
+            <a class="btn btn-outline-dark" href="/profile/orders">Theo dõi đơn hàng</a>
+            <a class="btn btn-outline-dark" href="/profile/password">Thay đổi mật khẩu</a>
+            <a class="btn btn-dark" href="/profile/address">Cập nhật địa chỉ</a>
+          </div>
+          <!-- Thông báo lỗi/thành công -->
+          <% if (error) { %>
+            <div class="alert alert-danger mt-3 mb-0">
+              <%= error %>
+            </div>
+            <% } %>
+              <% if (success) { %>
+                <div class="alert alert-success mt-3 mb-0">
+                  <%= success %>
+                </div>
+                <% } %>
+        </div>
+      </div>
+
+      <!-- Form nhập thông tin nhận hàng -->
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+          <h2 class="h6 text-uppercase text-muted">Địa chỉ giao hàng</h2>
+          <!-- Lưu thông tin giao hàng vào tài khoản -->
+          <form method="post" action="/profile/address">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">Người nhận</label>
+                <input class="form-control" type="text" name="receiverName" required
+                  value="<%= user ? user.receiverName || '' : '' %>" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Số điện thoại</label>
+                <input class="form-control" type="text" name="phone" required
+                  value="<%= user ? user.phone || '' : '' %>" />
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Tỉnh/Thành phố</label>
+                <input class="form-control" type="text" name="city" required
+                  value="<%= user ? user.city || '' : '' %>" />
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Phường/Xã</label>
+                <input class="form-control" type="text" name="ward" required
+                  value="<%= user ? user.ward || '' : '' %>" />
+              </div>
+              <div class="col-12">
+                <label class="form-label">Địa chỉ cụ thể</label>
+                <textarea class="form-control" name="address" rows="4"
+                  required><%= user ? user.address || "" : "" %></textarea>
+              </div>
+            </div>
+            <div class="mt-4 d-flex flex-wrap gap-2">
+              <button class="btn btn-dark" type="submit">Lưu địa chỉ</button>
+              <button class="btn btn-outline-dark" type="reset">Nhập lại</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+
+    <%- include("../partials/footer") %>

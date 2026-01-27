@@ -1,0 +1,208 @@
+<!-- Header website: topbar + navbar chính -->
+<header class="site-header">
+  <div class="topbar">
+    <div class="container d-flex justify-content-between align-items-center">
+      <div class="topbar-links">
+        <a href="/gioi-thieu">Giới thiệu</a>
+        <a href="/hop-tac">Hợp tác</a>
+      </div>
+      <div class="topbar-links">
+        <a href="/thanh-vien"><i class="bi bi-star-fill me-1"></i>Thành viên</a>
+        <a href="/tin-tuc">Tin tức</a>
+        <a href="/ho-tro">Hỗ trợ</a>
+        <% if (user && user.role==="admin" ) { %>
+          <a href="/admin">Quản trị</a>
+          <% } %>
+            <% if (user) { %>
+              <span class="text-white-50">Chào, <%= user.name %></span>
+              <form method="post" action="/logout" class="d-inline">
+                <button class="link-button text-white" type="submit">
+                  Đăng xuất
+                </button>
+              </form>
+              <% } else { %>
+                <a href="/login">Đăng nhập</a>
+                <% } %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navbar chính -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
+    <div class="container py-2">
+      <a class="navbar-brand fw-bold text-uppercase" href="/">
+        <span class="brand-mark"><i class="bi bi-house-door-fill"></i></span>
+        <span class="brand-text">VANTRUYEN</span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+        aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="mainNav">
+        <!-- Menu điều hướng -->
+        <ul class="navbar-nav mx-auto align-items-lg-center gap-lg-3">
+          <li class="nav-item">
+            <a class="nav-link" href="/new">NEW</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-primary fw-semibold" href="/ban-chay">BÁN CHẠY</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/nam">NAM</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/nu">NỮ</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/tre-em">TRẺ EM</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-danger fw-semibold" href="/sale">
+              SALE
+            </a>
+          </li>
+        </ul>
+        <!-- Tìm kiếm + tài khoản + giỏ hàng -->
+        <div class="nav-actions d-flex align-items-center gap-3">
+          <form class="search-pill" role="search" data-search>
+            <input type="search" name="q" placeholder="Tìm kiếm..." aria-label="Search" autocomplete="off" />
+            <button type="submit" aria-label="Search">
+              <i class="bi bi-search"></i>
+            </button>
+            <div class="search-suggest" hidden></div>
+          </form>
+          <a class="icon-btn" href="/profile" aria-label="Account">
+            <i class="bi bi-person"></i>
+          </a>
+          <a class="icon-btn cart-btn" href="/cart" aria-label="Cart">
+            <i class="bi bi-bag"></i>
+            <% if (cartCount && cartCount> 0) { %>
+              <span class="cart-badge">
+                <%= cartCount %>
+              </span>
+              <% } %>
+          </a>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<script>
+  const searchForm = document.querySelector("[data-search]");
+  const searchInput = searchForm ? searchForm.querySelector("input[name='q']") : null;
+  const suggestBox = searchForm ? searchForm.querySelector(".search-suggest") : null;
+
+  if (searchForm && searchInput && suggestBox) {
+    let abortController = null;
+    // Đóng danh sách gợi ý
+    const closeSuggest = () => {
+      suggestBox.hidden = true;
+      suggestBox.innerHTML = "";
+    };
+
+    // Render danh sách gợi ý
+    const renderSuggest = (items) => {
+      if (!items.length) {
+        closeSuggest();
+        return;
+      }
+      suggestBox.innerHTML = items
+        .map((item) => {
+          const price = item.price ? item.price.toLocaleString("vi-VN") + " VND" : "";
+          const image = item.mainImage || (item.galleryImages && item.galleryImages[0]) || "";
+          return `
+            <a class="search-suggest-item" href="/products/${item._id}">
+              <span class="search-suggest-thumb">
+                ${image ? `<img src="${image}" alt="${item.name}">` : "<span></span>"}
+              </span>
+              <span class="search-suggest-info">
+                <span class="search-suggest-name">${item.name}</span>
+                <span class="search-suggest-price">${price}</span>
+              </span>
+            </a>
+          `;
+        })
+        .join("");
+      suggestBox.hidden = false;
+    };
+
+    // Gọi API lấy gợi ý theo từ khóa
+    const fetchSuggest = async (value) => {
+      if (!value) {
+        closeSuggest();
+        return;
+      }
+      if (abortController) {
+        abortController.abort();
+      }
+      abortController = new AbortController();
+      try {
+        const res = await fetch(`/search-suggest?q=${encodeURIComponent(value)}`, {
+          signal: abortController.signal,
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        renderSuggest(data.items || []);
+      } catch (err) {
+        if (err.name !== "AbortError") {
+          closeSuggest();
+        }
+      }
+    };
+
+    let debounceTimer = null;
+    // Debounce nhập liệu tìm kiếm
+    searchInput.addEventListener("input", (event) => {
+      const value = event.target.value.trim();
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => fetchSuggest(value), 200);
+    });
+
+    // Hiện gợi ý khi focus nếu đã có từ khóa
+    searchInput.addEventListener("focus", () => {
+      const value = searchInput.value.trim();
+      if (value) fetchSuggest(value);
+    });
+
+    // Click ra ngoài thì đóng gợi ý
+    document.addEventListener("click", (event) => {
+      if (!searchForm.contains(event.target)) {
+        closeSuggest();
+      }
+    });
+
+    // Chặn submit mặc định, chỉ render gợi ý
+    searchForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const value = searchInput.value.trim();
+      if (value) fetchSuggest(value);
+    });
+  }
+
+  // Cập nhật số lượng giỏ hàng theo server
+  const syncCartBadge = (count) => {
+    const cartBtn = document.querySelector(".cart-btn");
+    if (!cartBtn) return;
+    let badge = cartBtn.querySelector(".cart-badge");
+    if (count > 0) {
+      if (!badge) {
+        badge = document.createElement("span");
+        badge.className = "cart-badge";
+        cartBtn.appendChild(badge);
+      }
+      badge.textContent = count;
+    } else if (badge) {
+      badge.remove();
+    }
+  };
+
+  fetch("/cart/count")
+    .then((res) => (res.ok ? res.json() : null))
+    .then((data) => {
+      if (data && typeof data.count === "number") {
+        syncCartBadge(data.count);
+      }
+    })
+    .catch(() => {});
+</script>

@@ -1,0 +1,76 @@
+<% const active="revenue" ; %>
+  <%- include("partials/head", { title, active }) %>
+    <%- include("partials/topbar", { heading: "Báo cáo doanh thu" , subtitle: "Tổng hợp từ đơn hàng hoàn thành" ,
+      actions: [] }) %>
+
+      <!-- Tổng quan doanh thu -->
+      <div class="row g-3">
+        <div class="col-12 col-lg-6">
+          <div class="admin-card">
+            <div class="admin-card-icon">
+              <i class="bi bi-currency-dollar"></i>
+            </div>
+            <div>
+              <p class="admin-card-label">Tổng doanh thu</p>
+              <h2>
+                <%= totalRevenue.toLocaleString("vi-VN") %> VND
+              </h2>
+              <span class="text-muted small">Tính từ đơn hàng hoàn thành</span>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-lg-6">
+          <div class="admin-card">
+            <div class="admin-card-icon">
+              <i class="bi bi-receipt"></i>
+            </div>
+            <div>
+              <p class="admin-card-label">Đơn hàng hoàn thành</p>
+              <h2>
+                <%= orderCount %>
+              </h2>
+              <span class="text-muted small">Đã giao thành công</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Biểu đồ doanh thu -->
+      <div class="admin-panel mt-4">
+        <div class="admin-panel-header">
+          <h3>Doanh thu 6 tháng gần nhất</h3>
+          <span class="text-muted">Tổng hợp từ đơn hàng hoàn thành</span>
+        </div>
+        <div class="admin-panel-card">
+          <% const chartMax=Math.max(...chartData.map((item)=> item.total), 1); %>
+            <div class="revenue-chart">
+              <!-- Cột doanh thu theo tháng -->
+              <% chartData.forEach((item)=> { %>
+                <div class="revenue-bar">
+                  <div class="revenue-bar-fill" data-height="<%= Math.round((item.total / chartMax) * 100) %>"
+                    title="<%= item.total.toLocaleString('vi-VN') %> VND"></div>
+                  <span>
+                    <%= item.label %>
+                  </span>
+                </div>
+                <% }) %>
+            </div>
+        </div>
+        <div class="admin-panel-card mt-3">
+          <h4>Chi tiết đơn hàng</h4>
+          <p>Kiểm tra từng đơn hàng để đối chiếu doanh thu và trạng thái.</p>
+          <a class="btn btn-outline-dark btn-sm" href="/admin/orders">
+            Xem danh sách đơn hàng
+          </a>
+        </div>
+      </div>
+
+      <script>
+        // Gán chiều cao cho từng cột doanh thu
+        document.querySelectorAll(".revenue-bar-fill").forEach((bar) => {
+          const value = parseInt(bar.dataset.height || "0", 10);
+          bar.style.height = `${Math.min(Math.max(value, 0), 100)}%`;
+        });
+      </script>
+
+      <%- include("partials/footer") %>

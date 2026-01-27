@@ -1,0 +1,21 @@
+<!-- Khung topbar: tieu đề + mô tả trang -->
+<div class="admin-topbar">
+  <div>
+    <h1>
+      <%= heading %>
+    </h1>
+    <p>
+      <%= subtitle %>
+    </p>
+  </div>
+  <!-- Nếu có hành động thì hiển thị nhóm nút phải -->
+  <% if (actions && actions.length) { %>
+    <div class="admin-actions">
+      <% actions.forEach((action)=> { %>
+        <a class="<%= action.className %>" href="<%= action.href %>">
+          <%= action.label %>
+        </a>
+        <% }) %>
+    </div>
+    <% } %>
+</div>

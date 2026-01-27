@@ -1,0 +1,329 @@
+<% const active = "products"; %>
+<% const actions = [{ href: "/admin/products", label: "Quay lại", className: "btn btn-outline-dark btn-sm" }]; %>
+<%- include("partials/head", { title, active }) %>
+<%- include("partials/topbar", { heading: title, subtitle: "Cập nhật thông tin sản phẩm", actions }) %>
+
+        <!-- Form thêm/sửa sản phẩm -->
+        <div class="card border-0 shadow-sm">
+          <div class="card-body p-4">
+            <form
+              method="post"
+              enctype="multipart/form-data"
+              action="<%= product ? '/admin/products/' + product._id : '/admin/products' %>"
+            >
+              <!-- Thông tin cơ bản -->
+              <div class="mb-3">
+                <label class="form-label">Tên sản phẩm</label>
+                <input
+                  class="form-control"
+                  name="name"
+                  type="text"
+                  required
+                  value="<%= product ? product.name : '' %>"
+                />
+              </div>
+        <!-- Giá và giảm giá -->
+        <div class="mb-3">
+          <label class="form-label">Giá (VND)</label>
+          <input
+            class="form-control"
+            name="price"
+            type="number"
+            min="0"
+            step="1000"
+            required
+            value="<%= product ? product.price : '' %>"
+          />
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Giảm giá (%)</label>
+          <input
+            class="form-control"
+            name="discountPercent"
+            type="number"
+            min="0"
+            max="100"
+            step="1"
+            value="<%= product ? product.discountPercent : 0 %>"
+          />
+          <div class="form-text">Nhập từ 0 đến 100.</div>
+        </div>
+        <!-- Danh mục và tồn kho -->
+        <div class="mb-3">
+          <label class="form-label">Danh mục</label>
+          <select class="form-select" name="category">
+            <option value="">Chưa phân loại</option>
+            <% categoryTree.forEach((node) => { %>
+              <% if (node.children.length > 0) { %>
+                <optgroup label="<%= node.category.name %>">
+                  <% node.children.forEach((child) => { %>
+                    <option
+                      value="<%= child._id %>"
+                      <%= product && product.category && product.category.toString() === child._id.toString() ? "selected" : "" %>
+                    >
+                      <%= child.name %>
+                    </option>
+                  <% }) %>
+                </optgroup>
+              <% } %>
+            <% }) %>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Tồn kho</label>
+          <input
+            class="form-control"
+            name="stock"
+            type="number"
+            min="0"
+            step="1"
+            value="<%= product ? product.stock : 0 %>"
+          />
+        </div>
+        <!-- Thuộc tính size/màu -->
+        <div class="mb-3">
+          <label class="form-label">Size</label>
+          <div class="d-flex flex-wrap gap-3">
+            <% const sizeOptions = ["XS", "S", "M", "L", "XL", "XXL"]; %>
+            <% sizeOptions.forEach((size) => { %>
+              <label class="form-check form-check-inline">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  name="sizes"
+                  value="<%= size %>"
+                  <%= product && product.sizes && product.sizes.includes(size) ? "checked" : "" %>
+                />
+                <span class="form-check-label"><%= size %></span>
+              </label>
+            <% }) %>
+          </div>
+          <div class="form-text">Chọn các size phù hợp.</div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Màu sắc</label>
+          <div class="d-flex flex-wrap gap-3">
+            <% const colorOptions = ["Đen", "Trắng", "Đỏ", "Xanh", "Be", "Nâu"]; %>
+            <% colorOptions.forEach((color) => { %>
+              <label class="form-check form-check-inline">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  name="colors"
+                  value="<%= color %>"
+                  <%= product && product.colors && product.colors.includes(color) ? "checked" : "" %>
+                />
+                <span class="form-check-label"><%= color %></span>
+              </label>
+            <% }) %>
+          </div>
+          <div class="form-text">Chọn các màu sắc phù hợp.</div>
+        </div>
+              <!-- Upload ảnh chính -->
+              <div class="mb-3">
+                <label class="form-label">Ảnh chính</label>
+                <input class="form-control" id="mainImageInput" name="mainImage" type="file" accept="image/*" />
+                <% if (product && product.mainImage) { %>
+                  <input type="hidden" name="existingMainImage" value="<%= product.mainImage %>" />
+                <% } %>
+                <div id="mainImagePreview" class="image-preview mt-2">
+                  <% if (product && product.mainImage) { %>
+                    <div class="preview-item" data-existing="true">
+                      <img src="<%= product.mainImage %>" alt="<%= product.name %>" />
+                      <button type="button" class="preview-remove" aria-label="Xóa ảnh">x</button>
+                    </div>
+                  <% } %>
+                </div>
+              </div>
+              <!-- Upload ảnh phụ -->
+              <div class="mb-3">
+                <label class="form-label">Ảnh phụ</label>
+                <input class="form-control" id="galleryImagesInput" name="galleryImages" type="file" accept="image/*" multiple />
+                <div class="form-text">Chọn tối đa 6 ảnh.</div>
+                <% if (product && product.galleryImages && product.galleryImages.length) { %>
+                  <input type="hidden" name="existingGalleryImages" value="<%= product.galleryImages.join(',') %>" />
+                <% } %>
+                <div id="galleryImagesPreview" class="image-preview mt-2">
+                  <% if (product && product.galleryImages && product.galleryImages.length) { %>
+                    <% product.galleryImages.forEach((img) => { %>
+                      <div class="preview-item" data-existing="true">
+                        <img src="<%= img %>" alt="<%= product.name %>" />
+                        <button type="button" class="preview-remove" aria-label="Xóa ảnh">x</button>
+                      </div>
+                    <% }) %>
+                  <% } %>
+                </div>
+              </div>
+        <!-- Mô tả chi tiết sản phẩm -->
+        <div class="mb-3">
+          <label class="form-label">Công nghệ</label>
+          <input class="form-control" name="technology" type="text" value="<%= product && product.specs ? product.specs.technology : '' %>" />
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Mã sản phẩm</label>
+          <input class="form-control" name="sku" type="text" value="<%= product && product.specs ? product.specs.sku : '' %>" />
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Chất liệu</label>
+          <input class="form-control" name="material" type="text" value="<%= product && product.specs ? product.specs.material : '' %>" />
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Kiểu dáng</label>
+          <input class="form-control" name="fit" type="text" value="<%= product && product.specs ? product.specs.fit : '' %>" />
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Phù hợp</label>
+          <input class="form-control" name="suitableFor" type="text" value="<%= product && product.specs ? product.specs.suitableFor : '' %>" />
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Tính năng</label>
+          <input class="form-control" name="features" type="text" value="<%= product && product.specs ? product.specs.features : '' %>" />
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Bảo quản</label>
+          <input class="form-control" name="care" type="text" value="<%= product && product.specs ? product.specs.care : '' %>" />
+        </div>
+        <!-- Trạng thái hiển thị -->
+        <div class="form-check mb-3">
+          <input
+            class="form-check-input"
+                  type="checkbox"
+                  name="isActive"
+                  value="true"
+                  id="productActive"
+                  <%= !product || product.isActive ? "checked" : "" %>
+                />
+                <label class="form-check-label" for="productActive">Hoạt động</label>
+              </div>
+              <button class="btn btn-dark" type="submit">Lưu</button>
+            </form>
+          </div>
+        </div>
+
+    <script>
+      // Xử lý preview ảnh và xóa ảnh đã chọn
+      const mainInput = document.getElementById("mainImageInput");
+      const mainPreview = document.getElementById("mainImagePreview");
+      const galleryInput = document.getElementById("galleryImagesInput");
+      const galleryPreview = document.getElementById("galleryImagesPreview");
+      const existingMainInput = document.querySelector("input[name='existingMainImage']");
+      const existingGalleryInput = document.querySelector("input[name='existingGalleryImages']");
+
+      // Xóa preview hiện tại
+      const clearPreview = (container) => {
+        while (container.firstChild) {
+          container.removeChild(container.firstChild);
+        }
+      };
+
+      // Tạo preview cho 1 ảnh
+      const renderImage = (file) => {
+        const wrapper = document.createElement("div");
+        wrapper.className = "preview-item";
+        const img = document.createElement("img");
+        img.src = URL.createObjectURL(file);
+        img.alt = file.name;
+        img.onload = () => URL.revokeObjectURL(img.src);
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "preview-remove";
+        btn.setAttribute("aria-label", "Xóa ảnh");
+        btn.textContent = "x";
+        wrapper.appendChild(img);
+        wrapper.appendChild(btn);
+        return { wrapper, btn };
+      };
+
+      // Cập nhật danh sách ảnh phụ cho input
+      const updateGalleryFiles = (files) => {
+        const dataTransfer = new DataTransfer();
+        files.forEach((file) => dataTransfer.items.add(file));
+        galleryInput.files = dataTransfer.files;
+      };
+
+      // Hiện preview ảnh chính mới chọn
+      const renderMainPreview = () => {
+        clearPreview(mainPreview);
+        if (!mainInput.files || !mainInput.files[0]) {
+          return;
+        }
+        const { wrapper, btn } = renderImage(mainInput.files[0]);
+        btn.addEventListener("click", () => {
+          mainInput.value = "";
+          clearPreview(mainPreview);
+        });
+        mainPreview.appendChild(wrapper);
+      };
+
+      let galleryFiles = [];
+      // Loại ảnh cũ khỏi hidden input
+      const removeExistingFromHidden = (value) => {
+        if (!existingGalleryInput || !existingGalleryInput.value) return;
+        const items = existingGalleryInput.value
+          .split(",")
+          .map((item) => item.trim())
+          .filter(Boolean)
+          .filter((item) => item !== value);
+        existingGalleryInput.value = items.join(",");
+      };
+
+      // Gắn sự kiện xóa ảnh đã tồn tại
+      const initExistingPreviews = () => {
+        mainPreview?.querySelectorAll(".preview-item[data-existing='true'] .preview-remove").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            if (existingMainInput) {
+              existingMainInput.remove();
+            }
+            btn.closest(".preview-item")?.remove();
+          });
+        });
+
+        galleryPreview?.querySelectorAll(".preview-item[data-existing='true']").forEach((item) => {
+          const btn = item.querySelector(".preview-remove");
+          const img = item.querySelector("img");
+          if (!btn || !img) return;
+          btn.addEventListener("click", () => {
+            removeExistingFromHidden(img.getAttribute("src"));
+            item.remove();
+          });
+        });
+      };
+
+      // Gộp ảnh phụ mới và cũ, giới hạn 6 ảnh
+      const mergeFiles = (current, incoming) => {
+        const map = new Map();
+        current.forEach((file) => {
+          map.set(`${file.name}-${file.size}-${file.lastModified}`, file);
+        });
+        incoming.forEach((file) => {
+          map.set(`${file.name}-${file.size}-${file.lastModified}`, file);
+        });
+        return Array.from(map.values()).slice(0, 6);
+      };
+
+      // Hiện preview danh sách ảnh phụ
+      const renderGalleryPreview = () => {
+        clearPreview(galleryPreview);
+        galleryFiles.forEach((file, index) => {
+          const { wrapper, btn } = renderImage(file);
+          btn.addEventListener("click", () => {
+            galleryFiles.splice(index, 1);
+            updateGalleryFiles(galleryFiles);
+            renderGalleryPreview();
+          });
+          galleryPreview.appendChild(wrapper);
+        });
+      };
+
+      mainInput?.addEventListener("change", renderMainPreview);
+
+      galleryInput?.addEventListener("change", () => {
+        const incoming = Array.from(galleryInput.files || []);
+        galleryFiles = mergeFiles(galleryFiles, incoming);
+        updateGalleryFiles(galleryFiles);
+        renderGalleryPreview();
+      });
+
+      initExistingPreviews();
+    </script>
+<%- include("partials/footer") %>

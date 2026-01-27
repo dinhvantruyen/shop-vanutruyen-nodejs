@@ -1,0 +1,209 @@
+<%- include("../partials/head", { title }) %>
+  <%- include("../partials/header") %>
+
+    <main class="container-fluid new-page">
+      <!-- Bố cục trang bán chạy -->
+      <div class="new-layout">
+        <!-- Khối bộ lọc -->
+        <aside class="filters">
+          <div class="filters-header">Bộ lọc</div>
+          <div class="filter-section">
+            <div class="filter-title">Danh mục</div>
+            <ul class="filter-list">
+              <% categories
+                .filter((category) => category.parent && category.isActive !== false)
+                .forEach((category) => { %>
+                <li>
+                  <label>
+                    <input type="checkbox" class="filter-category" value="<%= category._id %>" />
+                    <span>
+                      <%= category.name %>
+                    </span>
+                  </label>
+                </li>
+                <% }) %>
+            </ul>
+          </div>
+          <div class="filter-section">
+            <div class="filter-title">Giá</div>
+            <ul class="filter-list">
+              <li>
+                <label>
+                  <input type="checkbox" class="filter-price" data-min="0" data-max="200000" />
+                  <span>Dưới 200k</span>
+                </label>
+              </li>
+              <li>
+                <label>
+                  <input type="checkbox" class="filter-price" data-min="200000" data-max="400000" />
+                  <span>200k - 400k</span>
+                </label>
+              </li>
+              <li>
+                <label>
+                  <input type="checkbox" class="filter-price" data-min="400000" data-max="1000000000" />
+                  <span>Trên 400k</span>
+                </label>
+              </li>
+            </ul>
+          </div>
+          <div class="filter-section">
+            <div class="filter-title">Size</div>
+            <ul class="filter-list">
+              <li><label><input type="checkbox" /> <span>S</span></label></li>
+              <li><label><input type="checkbox" /> <span>M</span></label></li>
+              <li><label><input type="checkbox" /> <span>L</span></label></li>
+              <li><label><input type="checkbox" /> <span>XL</span></label></li>
+            </ul>
+          </div>
+        </aside>
+
+        <!-- Khối tiêu đề + sắp xếp + danh sách sản phẩm -->
+        <section class="new-content">
+          <div class="new-header new-header--bar">
+            <div>
+              <h1>Top sản phẩm bán chạy</h1>
+              <p class="text-muted mb-0">Những mẫu được yêu thích nhất thời gian gần đây.</p>
+            </div>
+            <div class="sort-box">
+              <label for="sortSelect">Sắp xếp:</label>
+              <select id="sortSelect" class="form-select form-select-sm">
+                <option value="name-asc">Tên A → Z</option>
+                <option value="name-desc">Tên Z → A</option>
+                <option value="price-asc">Giá tăng dần</option>
+                <option value="price-desc">Giá giảm dần</option>
+                <option value="newest">Hàng mới</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="product-grid">
+            <% if (products.length===0) { %>
+              <div class="alert alert-warning">Chưa có sản phẩm nào.</div>
+              <% } else { %>
+                <!-- Lặp sản phẩm bán chạy -->
+                <% products.forEach((product)=> { %>
+                  <% const image=product.mainImage || (product.galleryImages && product.galleryImages[0]) || "" ; %>
+                    <article class="product-card"
+                      data-category="<%= product.category ? product.category.toString() : '' %>"
+                      data-price="<%= product.price %>" data-name="<%= product.name.toLowerCase() %>"
+                      data-date="<%= product.createdAt ? new Date(product.createdAt).getTime() : 0 %>">
+                      <div class="product-media">
+                        <% if (image) { %>
+                          <a href="/products/<%= product._id %>">
+                            <img src="<%= image %>" alt="<%= product.name %>" />
+                          </a>
+                          <% } else { %>
+                            <div class="media-placeholder">No image</div>
+                            <% } %>
+                              <% if (product.discountPercent> 0) { %>
+                                <span class="product-badge">-<%= product.discountPercent %>%</span>
+                                <% } %>
+                      </div>
+                      <div class="product-body">
+                        <h2><a href="/products/<%= product._id %>">
+                            <%= product.name %>
+                          </a></h2>
+                        <div class="product-price">
+                          <% if (product.discountPercent> 0) { %>
+                            <% const discounted=Math.round(product.price * (100 - product.discountPercent) / 100); %>
+                              <span class="price-now">
+                                <%= discounted.toLocaleString("vi-VN") %> VND
+                              </span>
+                              <span class="price-old">
+                                <%= product.price.toLocaleString("vi-VN") %> VND
+                              </span>
+                              <% } else { %>
+                                <span class="price-now">
+                                  <%= product.price.toLocaleString("vi-VN") %> VND
+                                </span>
+                                <% } %>
+                        </div>
+                      </div>
+                    </article>
+                    <% }) %>
+                      <% } %>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <script>
+      // Nhóm bộ lọc danh mục và giá
+      const categoryInputs = document.querySelectorAll(".filter-category");
+      const priceInputs = document.querySelectorAll(".filter-price");
+      const productCards = document.querySelectorAll(".product-card");
+      const sortSelect = document.getElementById("sortSelect");
+
+      // Lấy danh sách danh mục được chọn
+      const getSelectedCategories = () =>
+        Array.from(categoryInputs)
+          .filter((input) => input.checked)
+          .map((input) => input.value);
+
+      // Lấy danh sách khoảng giá được chọn
+      const getSelectedPrices = () =>
+        Array.from(priceInputs)
+          .filter((input) => input.checked)
+          .map((input) => ({
+            min: Number(input.dataset.min),
+            max: Number(input.dataset.max),
+          }));
+
+      // Kiểm tra giá có nằm trong khoảng không
+      const matchesPrice = (price, ranges) => {
+        if (ranges.length === 0) return true;
+        return ranges.some((range) => price >= range.min && price < range.max);
+      };
+
+      // Áp dụng bộ lọc cho tất cả thẻ sản phẩm
+      const applyFilters = () => {
+        const selectedCategories = getSelectedCategories();
+        const selectedPrices = getSelectedPrices();
+
+        productCards.forEach((card) => {
+          const cardCategory = card.dataset.category;
+          const cardPrice = Number(card.dataset.price || 0);
+          const matchCategory =
+            selectedCategories.length === 0 || selectedCategories.includes(cardCategory);
+          const matchPrice = matchesPrice(cardPrice, selectedPrices);
+          card.style.display = matchCategory && matchPrice ? "" : "none";
+        });
+      };
+
+      // Lắng nghe thay đổi bộ lọc
+      categoryInputs.forEach((input) => input.addEventListener("change", applyFilters));
+      priceInputs.forEach((input) => input.addEventListener("change", applyFilters));
+
+      // Sắp xếp danh sách sản phẩm theo lựa chọn
+      const applySort = () => {
+        const grid = document.querySelector(".product-grid");
+        if (!grid || !sortSelect) return;
+        const cards = Array.from(grid.querySelectorAll(".product-card"));
+        const mode = sortSelect.value;
+        cards.sort((a, b) => {
+          if (mode === "name-asc") {
+            return (a.dataset.name || "").localeCompare(b.dataset.name || "");
+          }
+          if (mode === "name-desc") {
+            return (b.dataset.name || "").localeCompare(a.dataset.name || "");
+          }
+          if (mode === "price-asc") {
+            return Number(a.dataset.price || 0) - Number(b.dataset.price || 0);
+          }
+          if (mode === "price-desc") {
+            return Number(b.dataset.price || 0) - Number(a.dataset.price || 0);
+          }
+          if (mode === "newest") {
+            return Number(b.dataset.date || 0) - Number(a.dataset.date || 0);
+          }
+          return 0;
+        });
+        cards.forEach((card) => grid.appendChild(card));
+      };
+
+      // Lắng nghe thay đổi sắp xếp
+      sortSelect?.addEventListener("change", applySort);
+    </script>
+
+    <%- include("../partials/footer") %>

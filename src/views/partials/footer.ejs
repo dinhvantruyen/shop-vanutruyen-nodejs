@@ -1,0 +1,125 @@
+<!-- Sản phẩm đã xem gần đây -->
+<section class="recently-viewed" data-recently-viewed hidden>
+  <div class="container">
+    <div class="recently-header">
+      <h2>Sản phẩm đã xem</h2>
+      <p>Gợi ý những sản phẩm bạn đã xem gần đây.</p>
+    </div>
+    <div class="recently-grid"></div>
+  </div>
+</section>
+
+<!-- Footer chính của website -->
+<footer class="site-footer">
+  <div class="container py-5">
+    <!-- Khung liên hệ nhanh + mạng xã hội -->
+    <div class="footer-top">
+      <a class="btn btn-outline-light btn-sm" href="#">
+        ĐÓNG GÓP Ý KIẾN <i class="bi bi-arrow-right ms-2"></i>
+      </a>
+      <div class="footer-social">
+        <a href="#" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+        <a href="#" aria-label="Zalo"><span>Zalo</span></a>
+        <a href="#" aria-label="TikTok"><i class="bi bi-tiktok"></i></a>
+        <a href="#" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+        <a href="#" aria-label="YouTube"><i class="bi bi-youtube"></i></a>
+      </div>
+    </div>
+
+    <hr class="footer-divider" />
+
+    <!-- Các cột thông tin footer -->
+    <div class="row g-4">
+      <div class="col-6 col-lg-3">
+        <h6>VANTRUYEN</h6>
+        <ul class="footer-list">
+          <li><a href="/gioi-thieu">Giới thiệu</a></li>
+          <li><a href="/hop-tac">Hợp tác</a></li>
+          <li><a href="/thanh-vien">Thành viên</a></li>
+        </ul>
+        <h6 class="mt-4">CHÍNH SÁCH</h6>
+        <ul class="footer-list">
+          <li><a href="#">Chính sách đổi trả</a></li>
+          <li><a href="#">Chính sách giao hàng</a></li>
+          <li><a href="#">Chính sách bảo mật</a></li>
+        </ul>
+      </div>
+      <div class="col-6 col-lg-3">
+        <h6>TIN TỨC & HỖ TRỢ</h6>
+        <ul class="footer-list">
+          <li><a href="/tin-tuc">Tin tức</a></li>
+          <li><a href="/ho-tro">Hỗ trợ</a></li>
+        </ul>
+        <h6 class="mt-4">HƯỚNG DẪN</h6>
+        <ul class="footer-list">
+          <li><a href="#">Hướng dẫn chọn size</a></li>
+          <li><a href="#">Câu hỏi thường gặp</a></li>
+        </ul>
+      </div>
+      <div class="col-6 col-lg-3">
+        <h6>BỘ SƯU TẬP</h6>
+        <ul class="footer-list">
+          <li><a href="/nam">Đồ nam</a></li>
+          <li><a href="/nu">Đồ nữ</a></li>
+          <li><a href="/tre-em">Đồ trẻ em</a></li>
+          <li><a href="/new">Sản phẩm mới</a></li>
+          <li><a href="/sale">Khuyến mãi</a></li>
+        </ul>
+      </div>
+      <div class="col-6 col-lg-3">
+        <h6>LIÊN HỆ</h6>
+        <ul class="footer-list">
+          <li><a href="mailto:contact@vantruyen.vn">contact@vantruyen.vn</a></li>
+          <li><a href="tel:0900000000">0900 000 000</a></li>
+        </ul>
+        <h6 class="mt-4">ĐỊA CHỈ</h6>
+        <ul class="footer-list">
+          <li>Hà Nội: Km2 Đường Phùng Hưng, Hà Đông</li>
+          <li>TPHCM: KCN Cát Lái, TP Thủ Đức</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Bản quyền -->
+    <div class="footer-bottom">
+      <p>VANTRUYEN - All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Lấy danh sách sản phẩm đã xem từ localStorage và render
+  const recentlySection = document.querySelector("[data-recently-viewed]");
+  if (recentlySection) {
+    let items = [];
+    try {
+      items = JSON.parse(localStorage.getItem("recentlyViewed") || "[]");
+    } catch (err) {
+      items = [];
+    }
+    if (items.length) {
+      const grid = recentlySection.querySelector(".recently-grid");
+      grid.innerHTML = items
+        .slice(0, 5)
+        .map((item) => {
+          // Format giá và ảnh hiển thị
+          const price = item.price ? item.price.toLocaleString("vi-VN") + " VND" : "";
+          const image = item.image || "";
+          return `
+            <a class="recently-card" href="/products/${item.id}">
+              <span class="recently-thumb">
+                ${image ? `<img src="${image}" alt="${item.name}">` : "<span></span>"}
+              </span>
+              <span class="recently-body">
+                <span class="recently-name">${item.name}</span>
+                <span class="recently-price">${price}</span>
+              </span>
+            </a>
+          `;
+        })
+        .join("");
+      recentlySection.hidden = false;
+    }
+  }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

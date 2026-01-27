@@ -1,0 +1,57 @@
+<!-- Nhúng phần Head và Header chung -->
+<%- include("../partials/head", { title }) %>
+<%- include("../partials/header") %>
+
+<!-- Phần nội dung chính: Giao diện đăng nhập -->
+<main class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-8 col-lg-5">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+          <h1 class="h4 mb-3">Đăng nhập</h1>
+          <!-- Khối hiển thị thông báo lỗi (nếu có lỗi từ server trả về) -->
+          <% if (error) { %>
+            <div class="alert alert-danger"><%= error %></div>
+          <% } %>
+          <!-- Form đăng nhập: Gửi dữ liệu POST đến /login -->
+          <form method="post" action="/login">
+            <!-- Khối nhập Email -->
+            <div class="mb-3">
+              <label class="form-label">Email</label>
+              <input
+                type="email"
+                name="email"
+                class="form-control"
+                required
+              />
+            </div>
+            <!-- Khối nhập Mật khẩu -->
+            <div class="mb-3">
+              <label class="form-label">Mật khẩu</label>
+              <input
+                type="password"
+                name="password"
+                class="form-control"
+                required
+              />
+            </div>
+            <!-- Nút submit để thực hiện đăng nhập -->
+            <button class="btn btn-dark w-100" type="submit">
+              Đăng nhập
+            </button>
+          </form>
+          <p class="text-muted mt-2 mb-0">
+            <a href="/forgot-password">Quên mật khẩu?</a>
+          </p>
+          <!-- Liên kết điều hướng sang trang đăng ký nếu chưa có tài khoản -->
+          <p class="text-muted mt-3 mb-0">
+            Chưa có tài khoản? <a href="/register">Đăng ký</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Nhúng phần Footer chung -->
+<%- include("../partials/footer") %>

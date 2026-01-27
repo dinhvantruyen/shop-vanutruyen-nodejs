@@ -1,0 +1,70 @@
+<% const active = "products"; %>
+<% const actions = [{ href: "/admin/products/new", label: "Thêm sản phẩm", className: "btn btn-dark btn-sm" }]; %>
+<%- include("partials/head", { title, active }) %>
+<%- include("partials/topbar", { heading: "Quản lý sản phẩm", subtitle: "Quản lý giá bán, tồn kho và danh mục", actions }) %>
+
+        <!-- Bảng danh sách sản phẩm -->
+        <div class="card border-0 shadow-sm">
+          <div class="table-responsive">
+            <table class="table mb-0 align-middle admin-table">
+              <thead class="table-light">
+                <tr>
+                  <th class="text-center">Tên</th>
+                  <th class="text-center">Danh mục</th>
+                  <th class="text-center">Giá</th>
+                  <th class="text-center">Giảm giá</th>
+                  <th class="text-center">Thuộc tính</th>
+                  <th class="text-center">Tồn kho</th>
+                  <th class="text-end">Hành động</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Nếu chưa có sản phẩm thì hiện thông báo -->
+                <% if (products.length === 0) { %>
+                  <tr>
+                    <td colspan="7" class="text-center text-muted py-4">
+                      Chưa có sản phẩm nào.
+                    </td>
+                  </tr>
+                <% } else { %>
+                  <!-- Lặp qua danh sách sản phẩm -->
+                  <% products.forEach((product) => { %>
+                    <tr>
+                      <td class="text-center"><%= product.name %></td>
+                      <td class="text-muted text-center">
+                        <%= product.category ? product.category.name : "Chưa phân loại" %>
+                      </td>
+                      <td class="text-center"><%= product.price.toLocaleString("vi-VN") %> VND</td>
+                      <td class="text-center">
+                        <%= product.discountPercent ? product.discountPercent + '%' : '0%' %>
+                      </td>
+                      <td class="text-center">
+                        <% const sizeText = product.sizes && product.sizes.length ? product.sizes.join(', ') : '-'; %>
+                        <% const colorText = product.colors && product.colors.length ? product.colors.join(', ') : '-'; %>
+                        <span title="Size: <%= sizeText %> | Màu: <%= colorText %>">
+                          Size: <%= sizeText %> | Màu: <%= colorText %>
+                        </span>
+                      </td>
+                      <td class="text-center"><%= product.stock %></td>
+                      <td class="text-end">
+                        <a class="btn btn-outline-dark btn-sm" href="/admin/products/<%= product._id %>/edit">
+                          Sửa
+                        </a>
+                        <form
+                          method="post"
+                          action="/admin/products/<%= product._id %>/delete"
+                          class="d-inline"
+                        >
+                          <button class="btn btn-outline-danger btn-sm" type="submit">
+                            Xóa
+                          </button>
+                        </form>
+                      </td>
+                    </tr>
+                  <% }) %>
+                <% } %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+<%- include("partials/footer") %>

@@ -1,0 +1,69 @@
+<% const active = "categories"; %>
+<% const actions = [{ href: "/admin/categories/new", label: "Thêm danh mục", className: "btn btn-dark btn-sm" }]; %>
+<%- include("partials/head", { title, active }) %>
+<%- include("partials/topbar", { heading: "Quản lý danh mục", subtitle: "Cập nhật thông tin danh mục sản phẩm", actions }) %>
+
+        <!-- Khối hiển thị cây danh mục (cha/con) -->
+        <div class="admin-category-tree">
+          <% if (tree.length === 0) { %>
+            <div class="text-center text-muted py-4">
+              Chưa có danh mục nào.
+            </div>
+          <% } else { %>
+            <% tree.forEach((node) => { %>
+              <div class="category-group">
+                <div class="category-group-header">
+                  <div>
+                    <h3><%= node.category.name %></h3>
+                    <p><%= node.category.description || "Đang cập nhật." %></p>
+                  </div>
+                  <div class="category-actions">
+                    <span class="badge text-bg-<%= node.category.isActive ? "success" : "secondary" %>">
+                      <%= node.category.isActive ? "Hoạt động" : "Ẩn" %>
+                    </span>
+                    <a class="btn btn-outline-dark btn-sm" href="/admin/categories/<%= node.category._id %>/edit">
+                      Sửa
+                    </a>
+                    <form
+                      method="post"
+                      action="/admin/categories/<%= node.category._id %>/delete"
+                    >
+                      <button class="btn btn-outline-danger btn-sm" type="submit">
+                        Xóa
+                      </button>
+                    </form>
+                  </div>
+                </div>
+                <!-- Danh sách danh mục con -->
+                <% if (node.children.length > 0) { %>
+                  <ul class="category-children">
+                    <% node.children.forEach((child) => { %>
+                      <li>
+                        <div class="child-row">
+                          <span class="child-name"><%= child.name %></span>
+                          <span class="child-actions">
+                            <span class="badge text-bg-<%= child.isActive ? "success" : "secondary" %>">
+                              <%= child.isActive ? "Hoạt động" : "Ẩn" %>
+                            </span>
+                            <a class="btn btn-outline-dark btn-sm" href="/admin/categories/<%= child._id %>/edit">
+                              Sửa
+                            </a>
+                            <form
+                              method="post"
+                              action="/admin/categories/<%= child._id %>/delete"
+                            >
+                              <button class="btn btn-outline-danger btn-sm" type="submit">
+                                Xóa
+                              </button>
+                            </form>
+                          </span>
+                        </div>
+                      </li>
+                    <% }) %>
+                  </ul>
+                <% } %>
+              </div>
+            <% }) %>
+          <% } %>
+        </div>
+<%- include("partials/footer") %>

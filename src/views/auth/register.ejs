@@ -1,0 +1,74 @@
+<!-- Nhúng phần Head và Header chung -->
+<%- include("../partials/head", { title }) %>
+<%- include("../partials/header") %>
+
+<!-- Phần nội dung chính: Giao diện đăng ký -->
+<main class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-8 col-lg-5">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+          <h1 class="h4 mb-3">Đăng ký</h1>
+          <!-- Khối hiển thị thông báo lỗi (nếu có) -->
+          <% if (error) { %>
+            <div class="alert alert-danger"><%= error %></div>
+          <% } %>
+          <!-- Form đăng ký: Gửi dữ liệu POST đến /register -->
+          <form method="post" action="/register">
+            <!-- Khối nhập Họ tên -->
+            <div class="mb-3">
+              <label class="form-label">Họ tên</label>
+              <input
+                type="text"
+                name="name"
+                class="form-control"
+                required
+              />
+            </div>
+            <!-- Khối nhập Email -->
+            <div class="mb-3">
+              <label class="form-label">Email</label>
+              <input
+                type="email"
+                name="email"
+                class="form-control"
+                required
+              />
+            </div>
+            <!-- Khối nhập Mật khẩu -->
+            <div class="mb-3">
+              <label class="form-label">Mật khẩu</label>
+              <input
+                type="password"
+                name="password"
+                class="form-control"
+                required
+              />
+            </div>
+            <!-- Khối nhập lại Mật khẩu -->
+            <div class="mb-3">
+              <label class="form-label">Nhập lại mật khẩu</label>
+              <input
+                type="password"
+                name="confirmPassword"
+                class="form-control"
+                required
+              />
+            </div>
+            <!-- Nút submit đăng ký -->
+            <button class="btn btn-dark w-100" type="submit">
+              Đăng ký
+            </button>
+          </form>
+          <!-- Liên kết điều hướng sang trang đăng nhập -->
+          <p class="text-muted mt-3 mb-0">
+            Đã có tài khoản? <a href="/login">Đăng nhập</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Nhúng phần Footer chung -->
+<%- include("../partials/footer") %>

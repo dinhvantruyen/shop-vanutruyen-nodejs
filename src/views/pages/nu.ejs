@@ -1,0 +1,216 @@
+<%- include("../partials/head", { title }) %>
+  <%- include("../partials/header") %>
+
+    <main class="container-fluid new-page nu-page">
+      <!-- Banner giới thiệu danh mục nữ -->
+      <section class="banner">
+        <img src="/images/banners/banner_nu.png" alt="Sản phẩm nữ" />
+        <div class="banner-content">
+          <span class="banner-eyebrow">Womenswear</span>
+          <h1>Bộ sưu tập nữ</h1>
+          <p>Thanh lịch, tinh tế, tối giản cho phong cách hằng ngày.</p>
+          </div>
+      </section>
+
+      <!-- Thanh lọc bộ sưu tập nữ -->
+      <section class="filter-bar">
+        <div class="filter-title">Bộ sưu tập nữ</div>
+        <div class="filter-pills">
+          <a class="filter-pill <%= !selected ? 'active' : '' %>" href="/nu#products" data-category="">
+            Tất cả
+          </a>
+          <% categories.forEach((category)=> { %>
+            <a class="filter-pill <%= selected === category._id.toString() ? 'active' : '' %>"
+              href="/nu?category=<%= category._id %>#products" data-category="<%= category._id %>">
+              <%= category.name %>
+            </a>
+            <% }) %>
+        </div>
+      </section>
+
+      <!-- Danh sách sản phẩm -->
+      <div class="new-layout no-sidebar">
+        <section class="new-content" id="collection">
+          <% const discounted=products.filter(p=> p.discountPercent > 0); %>
+            <% const regular=products.filter(p=> !p.discountPercent || p.discountPercent === 0); %>
+
+              <div id="allSections">
+                <!-- Ưu đãi -->
+                <div class="product-section">
+                  <h2 class="section-title">Ưu đãi nổi bật</h2>
+                  <div id="discountedEmpty" class="alert alert-warning hidden">
+                    Chưa có sản phẩm giảm giá.
+                  </div>
+
+                  <div class="product-grid">
+                    <% discounted.forEach(product=> { %>
+                      <% const image=product.mainImage || (product.galleryImages && product.galleryImages[0]) || "" ; %>
+                        <article class="product-card" data-category="<%= product.category?.toString() || '' %>">
+                          <div class="product-media">
+                            <% if (image) { %>
+                              <a href="/products/<%= product._id %>">
+                                <img src="<%= image %>" alt="<%= product.name %>" />
+                              </a>
+                              <% } else { %>
+                                <div class="media-placeholder">No image</div>
+                                <% } %>
+                                  <span class="product-badge">-<%= product.discountPercent %>%</span>
+                          </div>
+                          <div class="product-body">
+                            <div class="product-meta">Bộ sưu tập nữ</div>
+                            <h2>
+                              <a href="/products/<%= product._id %>">
+                                <%= product.name %>
+                              </a>
+                            </h2>
+                            <div class="product-price">
+                              <% const discountedPrice=Math.round(product.price * (100 - product.discountPercent) /
+                                100); %>
+                                <span class="price-now">
+                                  <%= discountedPrice.toLocaleString("vi-VN") %> VND
+                                </span>
+                                <span class="price-old">
+                                  <%= product.price.toLocaleString("vi-VN") %> VND
+                                </span>
+                            </div>
+                          </div>
+                        </article>
+                        <% }) %>
+                  </div>
+                </div>
+
+                <!-- Sản phẩm nổi bật -->
+                <div class="product-section mt-4">
+                  <h2 class="section-title">Sản phẩm nổi bật</h2>
+                  <div id="regularEmpty" class="alert alert-warning hidden">
+                    Chưa có sản phẩm.
+                  </div>
+
+                  <div class="product-grid">
+                    <% regular.forEach(product=> { %>
+                      <% const image=product.mainImage || (product.galleryImages && product.galleryImages[0]) || "" ; %>
+                        <article class="product-card" data-category="<%= product.category?.toString() || '' %>">
+                          <div class="product-media">
+                            <% if (image) { %>
+                              <a href="/products/<%= product._id %>">
+                                <img src="<%= image %>" alt="<%= product.name %>" />
+                              </a>
+                              <% } else { %>
+                                <div class="media-placeholder">No image</div>
+                                <% } %>
+                          </div>
+                          <div class="product-body">
+                            <div class="product-meta">Bộ sưu tập nữ</div>
+                            <h2>
+                              <a href="/products/<%= product._id %>">
+                                <%= product.name %>
+                              </a>
+                            </h2>
+                            <div class="product-price">
+                              <span class="price-now">
+                                <%= product.price.toLocaleString("vi-VN") %> VND
+                              </span>
+                            </div>
+                          </div>
+                        </article>
+                        <% }) %>
+                  </div>
+                </div>
+              </div>
+        </section>
+      </div>
+
+      <!-- Tư vấn phong cách -->
+      <section class="intro-banner">
+        <div class="intro-content">
+          <h2>Tư vấn phong cách đồ nữ</h2>
+          <p>
+            Cần gợi ý phối đồ, chọn size hay chất liệu phù hợp?
+            Đội ngũ tư vấn sẵn sàng hỗ trợ bạn.
+          </p>
+          <a class="btn btn-dark" href="/ho-tro">Liên hệ tư vấn</a>
+        </div>
+      </section>
+
+      <!-- Gợi ý danh mục khác -->
+      <section class="suggested-section">
+        <div class="suggested-header">
+          <h2>Gợi ý danh mục khác</h2>
+          <p>Mở rộng lựa chọn với các bộ sưu tập theo mùa.</p>
+        </div>
+
+        <div class="suggested-grid">
+          <a class="suggested-card" href="/nam">
+            <div class="suggested-content">
+              <span class="suggested-tag">Đồ nam</span>
+              <h3>Mạnh mẽ, tối giản</h3>
+              <span class="suggested-cta">Khám phá ngay</span>
+            </div>
+          </a>
+
+          <a class="suggested-card" href="/tre-em">
+            <div class="suggested-content">
+              <span class="suggested-tag">Đồ trẻ em</span>
+              <h3>Thoải mái, bền bỉ</h3>
+              <span class="suggested-cta">Khám phá ngay</span>
+            </div>
+          </a>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      // Nhóm nút lọc danh mục
+      const pills = document.querySelectorAll(".filter-pill");
+      const allSections = document.getElementById("allSections");
+      const discountedEmpty = document.getElementById("discountedEmpty");
+      const regularEmpty = document.getElementById("regularEmpty");
+
+      // Cập nhật trạng thái nút đang chọn
+      const setActive = (category) => {
+        pills.forEach(pill => {
+          if (!category && pill.dataset.category === "") {
+            pill.classList.add("active");
+          } else {
+            pill.classList.toggle("active", pill.dataset.category === category);
+          }
+        });
+      };
+
+      // Lọc sản phẩm theo danh mục đã chọn
+      const applyFilter = (category) => {
+        const cards = allSections.querySelectorAll(".product-card");
+        cards.forEach(card => {
+          card.style.display = !category || card.dataset.category === category ? "" : "none";
+        });
+
+        discountedEmpty.classList.toggle(
+          "hidden",
+          allSections.querySelector(".product-section:first-child .product-card:not([style*='none'])")
+        );
+        regularEmpty.classList.toggle(
+          "hidden",
+          allSections.querySelector(".product-section:last-child .product-card:not([style*='none'])")
+        );
+      };
+
+      // Gán sự kiện click vào nút lọc
+      pills.forEach(pill => {
+        pill.addEventListener("click", e => {
+          e.preventDefault();
+          const category = pill.dataset.category || "";
+          setActive(category);
+          applyFilter(category);
+          window.history.replaceState({}, "", category ? `/nu?category=${category}#products` : "/nu#products");
+        });
+      });
+
+      // Khối tạo trang theo danh mục đang chọn
+      applyFilter("<%= selected %>");
+      setActive("<%= selected %>");
+    </script>
+
+    <%- include("../partials/footer") %>
+
+
+

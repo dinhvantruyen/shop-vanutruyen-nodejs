@@ -248,10 +248,12 @@ app.get("/nam", async (req, res, next) => {
     const childCategories = parent
       ? await Category.find({ parent: parent._id }).sort({ name: 1 })
       : [];
-    const childIds = childCategories.map((category) => category._id.toString());
-    const selected = req.query.category && childIds.includes(req.query.category)
-      ? req.query.category
-      : "";
+    const childIdStrings = childCategories.map((category) => category._id.toString());
+    const childIds = childCategories.map((category) => category._id);
+    const selected =
+      req.query.category && childIdStrings.includes(req.query.category)
+        ? req.query.category
+        : "";
     const products = await Product.find({ category: { $in: childIds } })
       .sort({ createdAt: -1 })
       .limit(24);
@@ -296,10 +298,12 @@ app.get("/nu", async (req, res, next) => {
     const childCategories = parent
       ? await Category.find({ parent: parent._id }).sort({ name: 1 })
       : [];
-    const childIds = childCategories.map((category) => category._id.toString());
-    const selected = req.query.category && childIds.includes(req.query.category)
-      ? req.query.category
-      : "";
+    const childIdStrings = childCategories.map((category) => category._id.toString());
+    const childIds = childCategories.map((category) => category._id);
+    const selected =
+      req.query.category && childIdStrings.includes(req.query.category)
+        ? req.query.category
+        : "";
     const products = await Product.find({ category: { $in: childIds } })
       .sort({ createdAt: -1 })
       .limit(24);
@@ -344,10 +348,12 @@ app.get("/tre-em", async (req, res, next) => {
     const childCategories = parent
       ? await Category.find({ parent: parent._id }).sort({ name: 1 })
       : [];
-    const childIds = childCategories.map((category) => category._id.toString());
-    const selected = req.query.category && childIds.includes(req.query.category)
-      ? req.query.category
-      : "";
+    const childIdStrings = childCategories.map((category) => category._id.toString());
+    const childIds = childCategories.map((category) => category._id);
+    const selected =
+      req.query.category && childIdStrings.includes(req.query.category)
+        ? req.query.category
+        : "";
     const products = await Product.find({ category: { $in: childIds } })
       .sort({ createdAt: -1 })
       .limit(24);

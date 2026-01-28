@@ -5,7 +5,8 @@ const connectDB = async () => {
   if (!uri) {
     throw new Error("MONGODB_URI is not set");
   }
-  await mongoose.connect(uri);
+  const dbName = process.env.MONGODB_DB;
+  await mongoose.connect(uri, dbName ? { dbName } : undefined);
   return mongoose.connection;
 };
 

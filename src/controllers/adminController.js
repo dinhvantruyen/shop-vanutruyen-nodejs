@@ -51,13 +51,13 @@ const validateCategoryParent = async (body) => {
 const buildProductPayload = (body, files = {}) => {
   const mainUpload =
     files.mainImage && files.mainImage[0]
-      ? `/uploads/${files.mainImage[0].filename}`
+      ? files.mainImage[0].path || `/uploads/${files.mainImage[0].filename}`
       : "";
   const existingMain = body.existingMainImage || "";
   const mainImage = mainUpload || existingMain;
 
   const galleryUploads = (files.galleryImages || []).map(
-    (file) => `/uploads/${file.filename}`
+    (file) => file.path || `/uploads/${file.filename}`
   );
   const existingGallery = body.existingGalleryImages
     ? body.existingGalleryImages
@@ -100,7 +100,7 @@ const buildProductPayload = (body, files = {}) => {
   };
 };
 
-const uploadsDir = path.join(__dirname, "..", "..", "uploads");
+const uploadsDir = process.env.UPLOADS_DIR || path.join(__dirname, "..", "..", "uploads");
 
 // Helper: Chuyển đường dẫn web thành đường dẫn file hệ thống
 const toUploadFilePath = (imagePath = "") => {

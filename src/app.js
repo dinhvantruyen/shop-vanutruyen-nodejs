@@ -25,7 +25,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(morgan("dev"));
 app.use(express.static(path.join(__dirname, "public")));
-app.use("/uploads", express.static(path.join(__dirname, "..", "uploads")));
+const uploadsDir = process.env.UPLOADS_DIR || path.join(__dirname, "..", "uploads");
+app.use("/uploads", express.static(uploadsDir));
 app.use(
   session({
     secret: process.env.SESSION_SECRET || "dev_secret",

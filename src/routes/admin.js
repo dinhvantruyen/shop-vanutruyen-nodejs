@@ -1,6 +1,8 @@
 const path = require("path");
 const express = require("express");
 const multer = require("multer");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const { cloudinary, hasCloudinaryConfig } = require("../config/cloudinary");
 const {
   adminHome,
   listCategories,
@@ -31,20 +33,31 @@ const {
 } = require("../controllers/adminController");
 
 const router = express.Router();
+const uploadsDir = process.env.UPLOADS_DIR || path.join(__dirname, "..", "..", "uploads");
 
 // Cấu hình Multer để xử lý upload file (lưu vào thư mục uploads)
-const upload = multer({
-  storage: multer.diskStorage({
-    destination: (req, file, cb) => {
-      cb(null, path.join(__dirname, "..", "..", "uploads"));
-    },
-    filename: (req, file, cb) => {
-      const ext = path.extname(file.originalname);
-      const unique = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-      cb(null, `${unique}${ext}`);
-    },
-  }),
-});
+const upload = hasCloudinaryConfig
+  ? multer({
+      storage: new CloudinaryStorage({
+        cloudinary,
+        params: {
+          folder: process.env.CLOUDINARY_FOLDER || "vanutruyen",
+          resource_type: "image",
+        },
+      }),
+    })
+  : multer({
+      storage: multer.diskStorage({
+        destination: (req, file, cb) => {
+          cb(null, uploadsDir);
+        },
+        filename: (req, file, cb) => {
+          const ext = path.extname(file.originalname);
+          const unique = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+          cb(null, `${unique}${ext}`);
+        },
+      }),
+    });
 
 // Trang chủ Admin (Dashboard)
 router.get("/", adminHome);

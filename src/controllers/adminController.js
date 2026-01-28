@@ -49,16 +49,24 @@ const validateCategoryParent = async (body) => {
 
 // Helper: Chuẩn bị dữ liệu sản phẩm từ request body và file upload
 const buildProductPayload = (body, files = {}) => {
-  const mainUpload =
-    files.mainImage && files.mainImage[0]
-      ? files.mainImage[0].path || `/uploads/${files.mainImage[0].filename}`
-      : "";
+  const getUploadUrl = (file) => {
+    if (!file) return "";
+    if (file.secure_url) return file.secure_url;
+    if (file.url) return file.url;
+    if (typeof file.path === "string" && /^https?:\/\//i.test(file.path)) {
+      return file.path;
+    }
+    if (file.filename) return `/uploads/${file.filename}`;
+    if (typeof file.path === "string" && file.path.startsWith("/uploads/")) {
+      return file.path;
+    }
+    return "";
+  };
+  const mainUpload = files.mainImage && files.mainImage[0] ? getUploadUrl(files.mainImage[0]) : "";
   const existingMain = body.existingMainImage || "";
   const mainImage = mainUpload || existingMain;
 
-  const galleryUploads = (files.galleryImages || []).map(
-    (file) => file.path || `/uploads/${file.filename}`
-  );
+  const galleryUploads = (files.galleryImages || []).map((file) => getUploadUrl(file));
   const existingGallery = body.existingGalleryImages
     ? body.existingGalleryImages
         .split(",")

@@ -1,4 +1,5 @@
 const path = require("path");
+const fs = require("fs");
 const express = require("express");
 const multer = require("multer");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
@@ -34,6 +35,9 @@ const {
 
 const router = express.Router();
 const uploadsDir = process.env.UPLOADS_DIR || path.join(__dirname, "..", "..", "uploads");
+if (!hasCloudinaryConfig) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
 
 // Cấu hình Multer để xử lý upload file (lưu vào thư mục uploads)
 const upload = hasCloudinaryConfig

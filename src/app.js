@@ -72,6 +72,10 @@ app.get("/health", (req, res) => {
   res.json({ status: "ok" });
 });
 
+app.get("/api/health", (req, res) => {
+  res.json({ ok: true });
+});
+
 app.get("/gioi-thieu", (req, res) => {
   res.render("pages/gioi-thieu", { title: "Giới thiệu" });
 });
